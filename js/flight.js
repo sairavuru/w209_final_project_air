@@ -11,6 +11,16 @@ flight_viz_lib.routemapPlot = function() {
   var path = d3.geoPath().projection(projection);
   var g = svg.append("g");
 
+  var routesData = [];
+  var airportData = [];
+  var data_ = function(rd, pd) {
+    var that = this;
+    if (!arguments.length) return that;
+    routesData = JSON.parse(JSON.stringify(rd));
+    airportData = JSON.parse(JSON.stringify(pd));
+    return that;
+  };
+
   var worldmap_ = function() {
     d3.json("./Data/worldmap.json").then(function(topology) {
         g.selectAll("path")
@@ -21,8 +31,15 @@ flight_viz_lib.routemapPlot = function() {
    });
   };
 
+  var routemap_ = function(alist) {
+     console.log(routesData);
+     console.log(airportData);
+  };
+
   var publicObjs = {
-    plotworld: worldmap_
+    data: data_,
+    plotworld: worldmap_,
+    plotroutes: routemap_
   };
 
   return publicObjs;
@@ -35,7 +52,8 @@ function sizeChange() {
 
 d3.select(window).on("resize", sizeChange);
 
-// get all data
+// route map viz
+var routes = flight_viz_lib.routemapPlot();
 
 Promise.all([
     d3.text("./Data/routes.csv"),
@@ -43,6 +61,7 @@ Promise.all([
     d3.text("./Data/airports.csv"),
     d3.text("./Data/planes.csv")
 ]).then(function(files) {
+    //get all data
     var routesData = d3.csvParseRows(files[0], function(d, i) {
         return {
         airline_code: d[0],
@@ -63,7 +82,7 @@ Promise.all([
         alias: d[2],
         iata: d[3],
         airline_code: d[4],
-        calsing: d[5],
+        call_sign: d[5],
         country: d[6],
         active: d[7]};
     });
@@ -93,11 +112,12 @@ Promise.all([
         icao_name: d[2]};
     });
 
-    //console.log(planesData);
+    // route map plot
+    routes.data(routesData, airportData);
+    routes.plotworld();
+    routes.plotroutes(["AA"]);
 
 }).catch(function(err) {
     // handle error here
 })
 
-var routes = flight_viz_lib.routemapPlot();
-routes.plotworld();
