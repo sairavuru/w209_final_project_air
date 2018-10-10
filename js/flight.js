@@ -6,10 +6,8 @@ flight_viz_lib.routemapPlot = function() {
   .append("svg")
   .attr("width", "100%");
 
-  var projection = d3.geoEquirectangular()
-    .center([50, 10]) //long and lat starting position
-    .scale(150) //starting zoom position
-    .rotate([10,0]); //where world split occurs
+  var projection = d3.geoEquirectangular();
+
   var path = d3.geoPath().projection(projection);
   var g = svg.append("g");
 
