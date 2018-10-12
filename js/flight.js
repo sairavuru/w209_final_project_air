@@ -16,8 +16,8 @@ flight_viz_lib.routemapPlot = function() {
   var data_ = function(rd, pd) {
     var that = this;
     if (!arguments.length) return that;
-    routesData = JSON.parse(JSON.stringify(rd));
-    airportData = JSON.parse(JSON.stringify(pd));
+    routesData = rd;
+    airportData = pd;
     return that;
   };
 
