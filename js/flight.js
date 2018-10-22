@@ -13,11 +13,47 @@ flight_viz_lib.routemapPlot = function() {
 
   var routesData = [];
   var airportData = [];
+  var routesWithLocations = [];
+
   var data_ = function(rd, pd) {
     var that = this;
     if (!arguments.length) return that;
     routesData = rd;
     airportData = pd;
+
+    function addLocations(airports, routes) {
+        var l = airports.length,
+            m = routes.length,
+		    lookupIndex = {},
+            output = [];
+        for (var i = 0; i < l; i++) { // loop through airports
+            var row = airports[i];
+            lookupIndex[row.airport_ID] = row; // create an index for lookup table
+        }
+        for (var j = 0; j < m; j++) { // loop through routes
+            var y = routes[j];
+			if (isNaN(y.src_port_id)|| isNaN(y.dest_port_id) || !(y.src_port_id in lookupIndex) ||  !(y.dest_port_id in lookupIndex) ) { continue; }
+            var src = lookupIndex[y.src_port_id];
+			var dest = lookupIndex[y.dest_port_id];
+			var item = { airline_code: y.airline_code,
+				airline_ID: y.airline_ID,
+				src_port_code: y.src_port_code,
+				src_port_id: y.src_port_id,
+				src_lat: src.lat,
+				src_long: src.long,
+				dest_port_code: y.dest_port_code,
+				dest_port_id: y.dest_port_id,
+				dest_lat: dest.lat,
+				dest_long: dest.long,
+				code_share: y.code_share,
+				stops: y.stops,
+				equipment: y.equipment};
+            output.push(item);
+        }
+		console.log("output");
+        return output;
+    };
+	routesWithLocations = addLocations(pd, rd);
     return that;
   };
 
@@ -32,8 +68,7 @@ flight_viz_lib.routemapPlot = function() {
   };
 
   var routemap_ = function(alist) {
-     console.log(routesData);
-     console.log(airportData);
+     console.log(routesWithLocations);
   };
 
   var publicObjs = {
