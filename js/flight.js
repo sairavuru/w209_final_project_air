@@ -67,8 +67,28 @@ flight_viz_lib.routemapPlot = function() {
    });
   };
 
-  var routemap_ = function(alist) {
+  var routemap_ = function(airline_code) {
      console.log(routesWithLocations);
+ var links = svg.append("g").attr("id", "flights")
+     .selectAll("path.flight")
+     .data(routesWithLocations)
+     .enter()
+     .append("path")
+	 .filter(function(d) { return d.airline_code === airline_code })
+	 .attr("class", "arc")
+     .attr("d", function(d) {
+		 var src_xy = projection([d.src_long, d.src_lat]),
+		 dest_xy = projection([d.dest_long, d.dest_lat]),
+		 dx = dest_xy[0] - src_xy[0],
+		 dy = dest_xy[1] - dest_xy[1],
+	     dr = Math.sqrt(dx * dx + dy * dy);
+	    return "M" + src_xy[0] + "," + src_xy[1] + "A" + dr + "," + dr + " 0 0,1 " + dest_xy[0] + "," + dest_xy[1];
+	  })
+     .style("fill", "none")
+     .style("stroke", "#252525")
+     .style("stroke-width", 0.5)
+     .style("stroke-opacity", 0.2);
+
   };
 
   var publicObjs = {
@@ -150,7 +170,7 @@ Promise.all([
     // route map plot
     routes.data(routesData, airportData);
     routes.plotworld();
-    routes.plotroutes(["AA"]);
+    routes.plotroutes("AA");
 
 }).catch(function(err) {
     // handle error here
