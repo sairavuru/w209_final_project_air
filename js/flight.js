@@ -7,8 +7,8 @@ flight_viz_lib.routemapPlot = function() {
   .attr("width", "100%");
 
   var projection = d3.geoEquirectangular();
-
   var path = d3.geoPath().projection(projection);
+
   var g = svg.append("g");
 
   var routesData = [];
@@ -75,14 +75,9 @@ flight_viz_lib.routemapPlot = function() {
      .enter()
      .append("path")
 	 .filter(function(d) { return d.airline_code === airline_code })
-	 .attr("class", "arc")
+	 .attr("class","route")
      .attr("d", function(d) {
-		 var src_xy = projection([d.src_long, d.src_lat]),
-		 dest_xy = projection([d.dest_long, d.dest_lat]),
-		 dx = dest_xy[0] - src_xy[0],
-		 dy = dest_xy[1] - dest_xy[1],
-	     dr = Math.sqrt(dx * dx + dy * dy);
-	    return "M" + src_xy[0] + "," + src_xy[1] + "A" + dr + "," + dr + " 0 0,1 " + dest_xy[0] + "," + dest_xy[1];
+		 return path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
 	  })
      .style("fill", "none")
      .style("stroke", "#252525")
