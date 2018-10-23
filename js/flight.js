@@ -1,13 +1,25 @@
 var flight_viz_lib = flight_viz_lib || {};
 
 flight_viz_lib.routemapPlot = function() {
+	
+var width = 1000,
+    height = 600;
 
   var svg = d3.select("#routemap")
   .append("svg")
-  .attr("width", "100%");
+    .attr('width', width)
+    .attr('height', height);
 
-  var projection = d3.geoEquirectangular();
-  var path = d3.geoPath().projection(projection);
+  //var projection = d3.geoEquirectangular();
+  //var path = d3.geoPath().projection(projection);
+  
+var projection = d3.geoRobinson()
+    .scale(180)
+    .translate([width / 2, height / 2]);
+
+var path = d3.geoPath()
+    .projection(projection)
+    .pointRadius(1);
 
   var g = svg.append("g");
 
@@ -67,14 +79,14 @@ flight_viz_lib.routemapPlot = function() {
    });
   };
 
-  var routemap_ = function(airline_code) {
+  var routemap_ = function(airline_ID) {
      console.log(routesWithLocations);
  var links = svg.append("g").attr("id", "flights")
      .selectAll("path.flight")
      .data(routesWithLocations)
      .enter()
      .append("path")
-	 .filter(function(d) { return d.airline_code === airline_code })
+	 .filter(function(d) { return d.airline_ID === airline_ID })
 	 .attr("class","route")
      .attr("d", function(d) {
 		 return path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
@@ -94,13 +106,6 @@ flight_viz_lib.routemapPlot = function() {
 
   return publicObjs;
 };
-
-function sizeChange() {
-    d3.select("g").attr("transform", "scale(" + $("#routemap").width()/900 + ")");
-    $("svg").height($("#routemap").width()*0.618);
-}
-
-d3.select(window).on("resize", sizeChange);
 
 // route map viz
 var routes = flight_viz_lib.routemapPlot();
@@ -165,7 +170,7 @@ Promise.all([
     // route map plot
     routes.data(routesData, airportData);
     routes.plotworld();
-    routes.plotroutes("AA");
+    routes.plotroutes(24);
 
 }).catch(function(err) {
     // handle error here
