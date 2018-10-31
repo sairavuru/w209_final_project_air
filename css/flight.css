@@ -3,3 +3,28 @@ path {
   stroke-width: 0.25px;
   fill: #778899;
 }
+
+  div#airlines {
+    position: relative;
+  }
+  div.airline-select {
+    display: inline-block;
+    font-size: 0.8em;
+    margin: 0 1em;
+  }
+  button {
+    display: inline-block;
+    width: 6em;
+    margin: 0;
+    padding: .5em;
+    outline: none;
+    color: #555;
+    background-color: #f7f7f7;
+    border: 1px dotted #f0f0f0;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #f0f0f0!important;
+  }
