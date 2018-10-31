@@ -79,9 +79,14 @@ var path = d3.geoPath()
    });
   };
 
-  var routemap_ = function(airline_ID) {
-     console.log(routesWithLocations);
- var links = svg.append("g").attr("id", "flights")
+  var routemap_ = function() {
+
+    d3.selectAll('button').style('background-color', '#f7f7f7');
+    d3.select(this).style('background-color', '#ddd');
+
+    var airline_ID = parseInt(this.dataset.airlineid);
+
+     var links = svg.append("g").attr("id", "flights")
      .selectAll("path.flight")
      .data(routesWithLocations)
      .enter()
@@ -166,11 +171,11 @@ Promise.all([
         iata_name: d[1],
         icao_name: d[2]};
     });
-
     // route map plot
     routes.data(routesData, airportData);
     routes.plotworld();
-    routes.plotroutes(24);
+        // Button listener
+    d3.selectAll('button.airline-select').on('mousedown', routes.plotroutes);
 
 }).catch(function(err) {
     // handle error here
