@@ -83,6 +83,7 @@ var path = d3.geoPath()
 
     d3.selectAll('button').style('background-color', '#f7f7f7');
     d3.select(this).style('background-color', '#ddd');
+    d3.selectAll("#flights").remove();
 
     var airline_ID = parseInt(this.dataset.airlineid);
 
