@@ -104,9 +104,16 @@ var path = d3.geoPath()
 
   };
 
+  var clear_routes_ = function () {
+	  d3.selectAll('button').style('background-color', '#f7f7f7');
+	  d3.select(this).style('background-color', '#ddd');
+      d3.selectAll("#flights").remove();
+  };
+
   var publicObjs = {
     data: data_,
     plotworld: worldmap_,
+    clearmap: clear_routes_,
     plotroutes: routemap_
   };
 
@@ -175,8 +182,9 @@ Promise.all([
     // route map plot
     routes.data(routesData, airportData);
     routes.plotworld();
-        // Button listener
+	// Button listener
     d3.selectAll('button.airline-select').on('mousedown', routes.plotroutes);
+    d3.select('#clear').on('mousedown', routes.clearmap);
 
 }).catch(function(err) {
     // handle error here
