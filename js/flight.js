@@ -97,7 +97,7 @@ var path = d3.geoPath()
 		 return path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
 	  })
      .style("fill", "none")
-     .style("stroke-width", 0.5)
+     .style("stroke-width", 0.6)
 	 .style("stroke", function(d) {
 		 if (d.code_share === "Y") {
              rt_col = "#377eb8";
