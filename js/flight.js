@@ -93,13 +93,20 @@ var path = d3.geoPath()
      .enter()
      .append("path")
 	 .filter(function(d) { return d.airline_ID === airline_ID })
-	 .attr("class","route")
      .attr("d", function(d) {
 		 return path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
 	  })
      .style("fill", "none")
-     .style("stroke", "#252525")
      .style("stroke-width", 0.5)
+	 .style("stroke", function(d) {
+		 if (d.code_share === "Y") {
+             rt_col = "#377eb8";
+		 }
+		 else {
+             rt_col = "#e41a1c";
+		 }
+	     return rt_col;
+	  })
      .style("stroke-opacity", 0.2);
 
   };
@@ -138,7 +145,7 @@ Promise.all([
         src_port_id: +d[3],
         dest_port_code: d[4],
         dest_port_id: +d[5],
-        code_share: +d[6],
+        code_share: d[6],
         stops: +d[7],
         equipment: d[8]};
     });
