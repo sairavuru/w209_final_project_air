@@ -2,7 +2,7 @@
 
 # Deploy script
 #
-# Usage: ./submit.sh -u my_ischool_username -d dir
+# Usage: ./deploy.sh -u my_ischool_username -d dir
 #
 
 ISCHOOL_USERNAME="${USER}"
@@ -25,5 +25,5 @@ done
 set -e
 
 echo "=== Deploying to ${ISCHOOL_USERNAME}@ischool.berkeley.edu:~/public_html/${DIRECTORY} ==="
-rsync -av -e ssh --exclude='deploy.sh' --exclude='.git' * ${ISCHOOL_USERNAME}@ischool.berkeley.edu:~/public_html/${DIRECTORY}
+rsync -av -e ssh --exclude='deploy.sh' --exclude='.git' --exclude='Data/.ipynb_checkpoints' * ${ISCHOOL_USERNAME}@ischool.berkeley.edu:~/public_html/${DIRECTORY}
 echo "=== Done ==="
