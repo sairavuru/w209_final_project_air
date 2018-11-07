@@ -203,22 +203,9 @@ Promise.all([
     d3.selectAll('button.airline-select').on('mousedown', routes.plotroutes);
     d3.select('#clear').on('mousedown', routes.clearmap);
 
-    $(function() {
-	  // The follow code has all airlines but too slow
-	  /*
-	  var airline_nm_ids = [];
-	  for (var i = 0; i < airlineData.length; i++) {
-		  airline_nm_ids.push({"label":airlineData[i].airline_name, "id": airlineData[i].airline_ID});
-	  }
-	  */
-      var airline_nm_ids = [
-
-          { label: "Alaska Airlines", id: "439"},
-          { label: "American Airlines", id: "24"}
-      ];
-
+    $.getJSON('./Data/topairlines.json', function(data) {
       $( "#airlineName" ).autocomplete({
-		  source: airline_nm_ids,
+		  source: data,
           select: function(event, ui) {
 			  console.log(ui.item.id);
 			  routes.searched(parseInt(ui.item.id));
@@ -226,6 +213,14 @@ Promise.all([
               return false;
           }
       });
+
+      $.ui.autocomplete.filter = function (array, term) {
+          var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(term), "i");
+          return $.grep(array, function (value) {
+              return matcher.test(value.label || value.value || value);
+          });
+      };
+
     });
 
 }).catch(function(err) {
