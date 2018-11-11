@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Flight Visualization</title>
+      <link rel="stylesheet" href="css/jquery-ui.min.css">
       <link rel="stylesheet" href="css/flight.css">
 </head>
 
@@ -15,12 +16,12 @@
    <button class="airline-select" data-airlineid="5209">UA</button>
   <button class="airline-select" data-airlineid="3320">LH</button>
   <button class="airline-select" data-airlineid="137">AF</button>
-  <textarea id="airlineName" name="txt-Name" placeholder="Search for airlines ..."></textarea>
-  <button id="search">Search</button>
+  <input id="airlineName" placeholder="Search for airlines ...">
   <button id="clear">Clear</button>
 </div>
 
 <script src='js/jquery.min.js'></script>
+<script src='js/jquery-ui.min.js'></script>
 <script src='js/d3.min.js'></script>
 <script src="js/topojson.min.js"></script>
 <script src="js/d3-geo.min.js"></script>

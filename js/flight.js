@@ -79,6 +79,30 @@ var path = d3.geoPath()
    });
   };
 
+  var routemap_for_id_ = function (airlineID) {
+      var links = svg.append("g").attr("id", "flights")
+      .selectAll("path.flight")
+      .data(routesWithLocations)
+      .enter()
+      .append("path")
+ 	 .filter(function(d) { return d.airline_ID === airlineID })
+      .attr("d", function(d) {
+ 		 return path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
+ 	  })
+      .style("fill", "none")
+      .style("stroke-width", 0.6)
+ 	 .style("stroke", function(d) {
+ 		 if (d.code_share === "Y") {
+              rt_col = "#377eb8";
+ 		 }
+ 		 else {
+              rt_col = "#e41a1c";
+ 		 }
+ 	     return rt_col;
+ 	  })
+      .style("stroke-opacity", 0.2);
+  };
+
   var routemap_ = function() {
 
     d3.selectAll('button').style('background-color', '#f7f7f7');
@@ -86,29 +110,14 @@ var path = d3.geoPath()
     d3.selectAll("#flights").remove();
 
     var airline_ID = parseInt(this.dataset.airlineid);
+    routemap_for_id_(airline_ID);
 
-     var links = svg.append("g").attr("id", "flights")
-     .selectAll("path.flight")
-     .data(routesWithLocations)
-     .enter()
-     .append("path")
-	 .filter(function(d) { return d.airline_ID === airline_ID })
-     .attr("d", function(d) {
-		 return path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
-	  })
-     .style("fill", "none")
-     .style("stroke-width", 0.6)
-	 .style("stroke", function(d) {
-		 if (d.code_share === "Y") {
-             rt_col = "#377eb8";
-		 }
-		 else {
-             rt_col = "#e41a1c";
-		 }
-	     return rt_col;
-	  })
-     .style("stroke-opacity", 0.2);
+  };
 
+  var routemap_for_searched_ = function (id) {
+	  d3.selectAll('button').style('background-color', '#f7f7f7');
+	  d3.selectAll("#flights").remove();
+	  routemap_for_id_ (id);
   };
 
   var clear_routes_ = function () {
@@ -121,6 +130,7 @@ var path = d3.geoPath()
     data: data_,
     plotworld: worldmap_,
     clearmap: clear_routes_,
+	searched: routemap_for_searched_,
     plotroutes: routemap_
   };
 
@@ -192,6 +202,26 @@ Promise.all([
 	// Button listener
     d3.selectAll('button.airline-select').on('mousedown', routes.plotroutes);
     d3.select('#clear').on('mousedown', routes.clearmap);
+
+    $.getJSON('./Data/topairlines.json', function(data) {
+      $( "#airlineName" ).autocomplete({
+		  source: data,
+          select: function(event, ui) {
+			  console.log(ui.item.id);
+			  routes.searched(parseInt(ui.item.id));
+              $(this).val("");
+              return false;
+          }
+      });
+
+      $.ui.autocomplete.filter = function (array, term) {
+          var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(term), "i");
+          return $.grep(array, function (value) {
+              return matcher.test(value.label || value.value || value);
+          });
+      };
+
+    });
 
 }).catch(function(err) {
     // handle error here
