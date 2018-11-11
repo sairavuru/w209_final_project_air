@@ -310,14 +310,14 @@ Promise.all([
     // route map plot
     routes.data(routesData, airportData);
     routes.plotworld();
-	
+
 	// Button listener
     d3.selectAll('button.airline-select').on('mousedown', routes.plotroutes);
     d3.select('#clear').on('mousedown', routes.clearmap);
 
     //input for distance filtering
     d3.select("#nValue").on("input", function() {
-      distmap.update_distance(1000);
+      distmap.update_distance(+this.value);
       distmap.plot_airport_routes();
     });
 
