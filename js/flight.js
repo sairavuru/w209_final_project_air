@@ -1,37 +1,45 @@
 var flight_viz_lib = flight_viz_lib || {};
 
-flight_viz_lib.routemapPlot = function() {
-
-var width = 1200,
-    height = 600;
-
-  var svg = d3.select("#routemap")
+flight_viz_lib.routesData = [];
+flight_viz_lib.airportData = [];
+flight_viz_lib.routesWithLocations = [];
+flight_viz_lib.width = 1200,
+flight_viz_lib.height = 600;
+flight_viz_lib.svg = d3.select("#routemap")
   .append("svg")
-    .attr('width', width)
-    .attr('height', height);
+  .attr('width', flight_viz_lib.width)
+  .attr('height', flight_viz_lib.height);
 
-  //var projection = d3.geoEquirectangular();
-  //var path = d3.geoPath().projection(projection);
+flight_viz_lib.distmapPlot = function(){
+
+	var routes_from_airport_ = function() {
+		console.log(flight_viz_lib);
+	}
+
+    var publicObjs = {
+		plot_airport_routes: routes_from_airport_
+    };
+
+    return publicObjs;
+};
+
+flight_viz_lib.routemapPlot = function() {
 
 var projection = d3.geoRobinson()
     .scale(180)
-    .translate([width / 2, height / 2]);
+    .translate([flight_viz_lib.width / 2, flight_viz_lib.height / 2]);
 
 var path = d3.geoPath()
     .projection(projection)
     .pointRadius(1);
 
-  var g = svg.append("g");
-
-  var routesData = [];
-  var airportData = [];
-  var routesWithLocations = [];
+  var g = flight_viz_lib.svg.append("g");
 
   var data_ = function(rd, pd) {
     var that = this;
     if (!arguments.length) return that;
-    routesData = rd;
-    airportData = pd;
+    flight_viz_lib.routesData = rd;
+    flight_viz_lib.airportData = pd;
 
     function addLocations(airports, routes) {
         var l = airports.length,
@@ -89,7 +97,7 @@ var path = d3.geoPath()
 		console.log("output");
         return output;
     };
-	routesWithLocations = addLocations(pd, rd);
+	flight_viz_lib.routesWithLocations = addLocations(pd, rd);
     return that;
   };
 
@@ -99,8 +107,9 @@ var path = d3.geoPath()
         .data(topojson.feature(topology, topology.objects.countries).features)
         .enter()
         .append("path")
-        .attr("d", path)
+        .attr("d", path);
         //mouseover to change path opacity (in progress: display information)
+		/*
         .on('mouseover', function(d, i) {
             var currentState = this;
             d3.select(this).style('fill-opacity', 1)})
@@ -126,14 +135,14 @@ var path = d3.geoPath()
     		.attr("cx", function (d) { console.log(projection(d)); return projection(d)[0]; })
     		.attr("cy", function (d) { return projection(d)[1]; })
     		.attr("r", "5px")
-    		.attr("fill", "red");
+    		.attr("fill", "red");*/
    });
   };
 
   var routemap_for_id_ = function (airlineID) {
-      var links = svg.append("g").attr("id", "flights")
+      var links = flight_viz_lib.svg.append("g").attr("id", "flights")
       .selectAll("path.flight")
-      .data(routesWithLocations)
+      .data(flight_viz_lib.routesWithLocations)
       .enter()
       .append("path")
  	 .filter(function(d) { return d.airline_ID === airlineID })
@@ -164,11 +173,11 @@ var path = d3.geoPath()
     routemap_for_id_(airline_ID);
 
 		//var airline_distance = parseInt(this.dataset.)
-    var max_dist = 5000;
+    var max_dist = 300;
 
-     var links = svg.append("g").attr("id", "flights")
+     var links = flight_viz_lib.svg.append("g").attr("id", "flights")
      .selectAll("path.flight")
-     .data(routesWithLocations)
+     .data(flight_viz_lib.routesWithLocations)
      .enter()
      .append("path")
 	   .filter(function(d) { return d.airline_ID === airline_ID })
@@ -216,6 +225,7 @@ var path = d3.geoPath()
 
 // route map viz
 var routes = flight_viz_lib.routemapPlot();
+var distmap = flight_viz_lib.distmapPlot();
 
 Promise.all([
     d3.text("./Data/routes.csv"),
@@ -276,6 +286,7 @@ Promise.all([
     // route map plot
     routes.data(routesData, airportData);
     routes.plotworld();
+	distmap.plot_airport_routes();
 	// Button listener
     d3.selectAll('button.airline-select').on('mousedown', routes.plotroutes);
     d3.select('#clear').on('mousedown', routes.clearmap);
