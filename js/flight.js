@@ -10,14 +10,61 @@ flight_viz_lib.svg = d3.select("#routemap")
   .attr('width', flight_viz_lib.width)
   .attr('height', flight_viz_lib.height);
 
+flight_viz_lib.projection = d3.geoRobinson()
+    .scale(180)
+    .translate([flight_viz_lib.width / 2, flight_viz_lib.height / 2]);
+
+flight_viz_lib.path = d3.geoPath()
+    .projection(flight_viz_lib.projection)
+    .pointRadius(1);
+
 flight_viz_lib.distmapPlot = function(){
+
+    var current_airline_id = -1;
+    var current_max_dist = 5000;
+
+    var update_current_airline_id_ = function(id){
+		current_airline_id = id;
+	};
+
+    var update_max_dist_ = function(dist){
+		current_max_dist = dist;
+	};
 
 	var routes_from_airport_ = function() {
 		console.log(flight_viz_lib);
-	}
+
+			//var airline_distance = parseInt(this.dataset.)
+		d3.selectAll("#flights").remove();
+// the following code is temporary for proof-of concept
+	     var links = flight_viz_lib.svg.append("g").attr("id", "flights")
+	     .selectAll("path.flight")
+	     .data(flight_viz_lib.routesWithLocations)
+	     .enter()
+	     .append("path")
+		   .filter(function(d) { return d.airline_ID === current_airline_id })
+	     .filter(function(d) { return d.trip_dist < current_max_dist })
+	     .attr("d", function(d) {
+			 return flight_viz_lib.path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
+		  })
+	     .style("fill", "none")
+	     .style("stroke-width", 0.6)
+		   .style("stroke", function(d) {
+	  		 if (d.code_share === "Y") {
+	               rt_col = "#377eb8";
+	  		 }
+	  		 else {
+	               rt_col = "#e41a1c";
+	  		 }
+	  	     return rt_col;
+	  	  })
+	     .style("stroke-opacity", 0.2);
+	};
 
     var publicObjs = {
-		plot_airport_routes: routes_from_airport_
+		plot_airport_routes: routes_from_airport_,
+		update_airline: update_current_airline_id_,
+		update_distance: update_max_dist_
     };
 
     return publicObjs;
@@ -25,13 +72,7 @@ flight_viz_lib.distmapPlot = function(){
 
 flight_viz_lib.routemapPlot = function() {
 
-var projection = d3.geoRobinson()
-    .scale(180)
-    .translate([flight_viz_lib.width / 2, flight_viz_lib.height / 2]);
 
-var path = d3.geoPath()
-    .projection(projection)
-    .pointRadius(1);
 
   var g = flight_viz_lib.svg.append("g");
 
@@ -107,7 +148,7 @@ var path = d3.geoPath()
         .data(topojson.feature(topology, topology.objects.countries).features)
         .enter()
         .append("path")
-        .attr("d", path);
+        .attr("d", flight_viz_lib.path);
         //mouseover to change path opacity (in progress: display information)
 		/*
         .on('mouseover', function(d, i) {
@@ -147,7 +188,7 @@ var path = d3.geoPath()
       .append("path")
  	 .filter(function(d) { return d.airline_ID === airlineID })
       .attr("d", function(d) {
- 		 return path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
+ 		 return flight_viz_lib.path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
  	  })
       .style("fill", "none")
       .style("stroke-width", 0.6)
@@ -170,33 +211,8 @@ var path = d3.geoPath()
     d3.selectAll("#flights").remove();
 
     var airline_ID = parseInt(this.dataset.airlineid);
+	distmapcb.update_airline(airline_ID);
     routemap_for_id_(airline_ID);
-
-		//var airline_distance = parseInt(this.dataset.)
-    var max_dist = 300;
-
-     var links = flight_viz_lib.svg.append("g").attr("id", "flights")
-     .selectAll("path.flight")
-     .data(flight_viz_lib.routesWithLocations)
-     .enter()
-     .append("path")
-	   .filter(function(d) { return d.airline_ID === airline_ID })
-     .filter(function(d) { return d.trip_dist < max_dist })
-     .attr("d", function(d) {
-		 return path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
-	  })
-     .style("fill", "none")
-     .style("stroke-width", 0.6)
-	   .style("stroke", function(d) {
-  		 if (d.code_share === "Y") {
-               rt_col = "#377eb8";
-  		 }
-  		 else {
-               rt_col = "#e41a1c";
-  		 }
-  	     return rt_col;
-  	  })
-     .style("stroke-opacity", 0.2);
    };
 
   var routemap_for_searched_ = function (id) {
@@ -211,13 +227,21 @@ var path = d3.geoPath()
       d3.selectAll("#flights").remove();
   };
 
+  var distmapcb = function() {};
+  var distmapcb_ = function(_) {
+      var that = this;
+      if (!arguments.length) return distmapcb;
+      distmapcb = _;
+      return that;
+  };
 
   var publicObjs = {
     data: data_,
     plotworld: worldmap_,
     clearmap: clear_routes_,
 	searched: routemap_for_searched_,
-    plotroutes: routemap_
+    plotroutes: routemap_,
+	distmap: distmapcb_
   };
 
   return publicObjs;
@@ -226,6 +250,7 @@ var path = d3.geoPath()
 // route map viz
 var routes = flight_viz_lib.routemapPlot();
 var distmap = flight_viz_lib.distmapPlot();
+routes.distmap(distmap);
 
 Promise.all([
     d3.text("./Data/routes.csv"),
@@ -286,15 +311,15 @@ Promise.all([
     // route map plot
     routes.data(routesData, airportData);
     routes.plotworld();
-	distmap.plot_airport_routes();
+	
 	// Button listener
     d3.selectAll('button.airline-select').on('mousedown', routes.plotroutes);
     d3.select('#clear').on('mousedown', routes.clearmap);
 
     //input for distance filtering
     d3.select("#nValue").on("input", function() {
-      update(routemap_.max_dist);
-      routes.plotroutes;
+      distmap.update_distance(1000);
+      distmap.plot_airport_routes();
     });
 
     //autofill for airlines
@@ -303,6 +328,7 @@ Promise.all([
 		  source: data,
       select: function(event, ui) {
 			  console.log(ui.item.id);
+			  distmap.update_airline(parseInt(ui.item.id));
 			  routes.searched(parseInt(ui.item.id));
               $(this).val("");
               return false;
