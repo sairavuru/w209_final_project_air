@@ -99,7 +99,34 @@ var path = d3.geoPath()
         .data(topojson.feature(topology, topology.objects.countries).features)
         .enter()
         .append("path")
-        .attr("d", path);
+        .attr("d", path)
+        //mouseover to change path opacity (in progress: display information)
+        .on('mouseover', function(d, i) {
+            var currentState = this;
+            d3.select(this).style('fill-opacity', 1)})
+        .on('mouseout', function(d, i) {
+            d3.selectAll('path')
+              .style({'fill-opacity':.1})
+            });
+
+
+        // add circles to origins
+        g.selectAll("circle")
+    		.data([item.src_lat,item.src_long]).enter()
+    		.append("circle")
+    		.attr("cx", function (d) { console.log(projection(d)); return projection(d)[0]; })
+    		.attr("cy", function (d) { return projection(d)[1]; })
+    		.attr("r", "5px")
+    		.attr("fill", "red");
+
+        // add circles to destinations
+        g.selectAll("circle")
+    		.data([item.dest_lat,item.dest_long]).enter()
+    		.append("circle")
+    		.attr("cx", function (d) { console.log(projection(d)); return projection(d)[0]; })
+    		.attr("cy", function (d) { return projection(d)[1]; })
+    		.attr("r", "5px")
+    		.attr("fill", "red");
    });
   };
 
