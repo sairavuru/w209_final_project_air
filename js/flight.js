@@ -1,8 +1,8 @@
 var flight_viz_lib = flight_viz_lib || {};
 
 flight_viz_lib.routemapPlot = function() {
-	
-var width = 1000,
+
+var width = 1200,
     height = 600;
 
   var svg = d3.select("#routemap")
@@ -12,7 +12,7 @@ var width = 1000,
 
   //var projection = d3.geoEquirectangular();
   //var path = d3.geoPath().projection(projection);
-  
+
 var projection = d3.geoRobinson()
     .scale(180)
     .translate([width / 2, height / 2]);
@@ -47,6 +47,29 @@ var path = d3.geoPath()
 			if (isNaN(y.src_port_id)|| isNaN(y.dest_port_id) || !(y.src_port_id in lookupIndex) ||  !(y.dest_port_id in lookupIndex) ) { continue; }
             var src = lookupIndex[y.src_port_id];
 			var dest = lookupIndex[y.dest_port_id];
+
+      function distance(lat1, lon1, lat2, lon2, unit) {
+        	if ((lat1 == lat2) && (lon1 == lon2)) {
+        		return 0;
+        	}
+        	else {
+        		var radlat1 = Math.PI * lat1/180;
+        		var radlat2 = Math.PI * lat2/180;
+        		var theta = lon1-lon2;
+        		var radtheta = Math.PI * theta/180;
+        		var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+        		if (dist > 1) {
+        			dist = 1;
+        		}
+        		dist = Math.acos(dist);
+        		dist = dist * 180/Math.PI;
+        		dist = dist * 60 * 1.1515;
+        		if (unit=="K") { dist = dist * 1.609344 }
+        		if (unit=="N") { dist = dist * 0.8684 }
+        		return dist;
+        	}
+        }
+
 			var item = { airline_code: y.airline_code,
 				airline_ID: y.airline_ID,
 				src_port_code: y.src_port_code,
@@ -57,6 +80,7 @@ var path = d3.geoPath()
 				dest_port_id: y.dest_port_id,
 				dest_lat: dest.lat,
 				dest_long: dest.long,
+        trip_dist: distance(src.lat, src.long, dest.lat, dest.long, "N"),
 				code_share: y.code_share,
 				stops: y.stops,
 				equipment: y.equipment};
@@ -75,7 +99,34 @@ var path = d3.geoPath()
         .data(topojson.feature(topology, topology.objects.countries).features)
         .enter()
         .append("path")
-        .attr("d", path);
+        .attr("d", path)
+        //mouseover to change path opacity (in progress: display information)
+        .on('mouseover', function(d, i) {
+            var currentState = this;
+            d3.select(this).style('fill-opacity', 1)})
+        .on('mouseout', function(d, i) {
+            d3.selectAll('path')
+              .style({'fill-opacity':.1})
+            });
+
+
+        // add circles to origins
+        g.selectAll("circle")
+    		.data([item.src_lat,item.src_long]).enter()
+    		.append("circle")
+    		.attr("cx", function (d) { console.log(projection(d)); return projection(d)[0]; })
+    		.attr("cy", function (d) { return projection(d)[1]; })
+    		.attr("r", "5px")
+    		.attr("fill", "red");
+
+        // add circles to destinations
+        g.selectAll("circle")
+    		.data([item.dest_lat,item.dest_long]).enter()
+    		.append("circle")
+    		.attr("cx", function (d) { console.log(projection(d)); return projection(d)[0]; })
+    		.attr("cy", function (d) { return projection(d)[1]; })
+    		.attr("r", "5px")
+    		.attr("fill", "red");
    });
   };
 
@@ -112,7 +163,32 @@ var path = d3.geoPath()
     var airline_ID = parseInt(this.dataset.airlineid);
     routemap_for_id_(airline_ID);
 
-  };
+		//var airline_distance = parseInt(this.dataset.)
+    var max_dist = 5000;
+
+     var links = svg.append("g").attr("id", "flights")
+     .selectAll("path.flight")
+     .data(routesWithLocations)
+     .enter()
+     .append("path")
+	   .filter(function(d) { return d.airline_ID === airline_ID })
+     .filter(function(d) { return d.trip_dist < max_dist })
+     .attr("d", function(d) {
+		 return path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
+	  })
+     .style("fill", "none")
+     .style("stroke-width", 0.6)
+	   .style("stroke", function(d) {
+  		 if (d.code_share === "Y") {
+               rt_col = "#377eb8";
+  		 }
+  		 else {
+               rt_col = "#e41a1c";
+  		 }
+  	     return rt_col;
+  	  })
+     .style("stroke-opacity", 0.2);
+   };
 
   var routemap_for_searched_ = function (id) {
 	  d3.selectAll('button').style('background-color', '#f7f7f7');
@@ -125,6 +201,7 @@ var path = d3.geoPath()
 	  d3.select(this).style('background-color', '#ddd');
       d3.selectAll("#flights").remove();
   };
+
 
   var publicObjs = {
     data: data_,
@@ -203,10 +280,17 @@ Promise.all([
     d3.selectAll('button.airline-select').on('mousedown', routes.plotroutes);
     d3.select('#clear').on('mousedown', routes.clearmap);
 
+    //input for distance filtering
+    d3.select("#nValue").on("input", function() {
+      update(routemap_.max_dist);
+      routes.plotroutes;
+    });
+
+    //autofill for airlines
     $.getJSON('./Data/topairlines.json', function(data) {
       $( "#airlineName" ).autocomplete({
 		  source: data,
-          select: function(event, ui) {
+      select: function(event, ui) {
 			  console.log(ui.item.id);
 			  routes.searched(parseInt(ui.item.id));
               $(this).val("");
@@ -226,4 +310,3 @@ Promise.all([
 }).catch(function(err) {
     // handle error here
 })
-
