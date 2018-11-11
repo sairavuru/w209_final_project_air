@@ -1,10 +1,13 @@
 var flight_viz_lib = flight_viz_lib || {};
 
-flight_viz_lib.routesData = [];
-flight_viz_lib.airportData = [];
-flight_viz_lib.routesWithLocations = [];
-flight_viz_lib.width = 1200,
-flight_viz_lib.height = 600;
+flight_viz_lib = {
+	routesData : [],
+	airportData : [],
+	routesWithLocations:[],
+	width:1200,
+	height:600
+};
+
 flight_viz_lib.svg = d3.select("#routemap")
   .append("svg")
   .attr('width', flight_viz_lib.width)
@@ -32,8 +35,6 @@ flight_viz_lib.distmapPlot = function(){
 	};
 
 	var routes_from_airport_ = function() {
-		console.log(flight_viz_lib);
-
 			//var airline_distance = parseInt(this.dataset.)
 		d3.selectAll("#flights").remove();
 // the following code is temporary for proof-of concept
@@ -71,8 +72,6 @@ flight_viz_lib.distmapPlot = function(){
 };
 
 flight_viz_lib.routemapPlot = function() {
-
-
 
   var g = flight_viz_lib.svg.append("g");
 
