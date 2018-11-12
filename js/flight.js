@@ -24,7 +24,7 @@ flight_viz_lib.path = d3.geoPath()
 flight_viz_lib.distmapPlot = function(){
 
     var current_airline_id = -1;
-		var current_origin_id = -1;
+		var current_origin_id = "";
 		var current_max_dist = 5000;
 
     var update_current_airline_id_ = function(id){
@@ -360,7 +360,7 @@ Promise.all([
 			  select: function(event, ui) {
 				  //console.log(ui.item.label);
 				  distmap.update_origin(ui.item.label);
-				  routes.searched(ui.item.label);
+				  distmap.plot_airport_routes();
 			          $(this).val("");
 			          return false;
 			      }
