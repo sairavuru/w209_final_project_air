@@ -24,10 +24,16 @@ flight_viz_lib.path = d3.geoPath()
 flight_viz_lib.distmapPlot = function(){
 
     var current_airline_id = -1;
-    var current_max_dist = 5000;
+		var current_origin_id = -1;
+		var current_max_dist = 5000;
 
     var update_current_airline_id_ = function(id){
 		current_airline_id = id;
+	};
+
+		var update_current_origin_id_ = function(id){
+		//console.log(id)
+		current_origin_id = id;
 	};
 
     var update_max_dist_ = function(dist){
@@ -36,6 +42,7 @@ flight_viz_lib.distmapPlot = function(){
 
 	var routes_from_airport_ = function() {
 			//var airline_distance = parseInt(this.dataset.)
+			//console.log(current_origin_id)
 		d3.selectAll("#flights").remove();
 // the following code is temporary for proof-of concept
 	     var links = flight_viz_lib.svg.append("g").attr("id", "flights")
@@ -44,6 +51,8 @@ flight_viz_lib.distmapPlot = function(){
 	     .enter()
 	     .append("path")
 		   .filter(function(d) { return d.airline_ID === current_airline_id })
+			 .filter(function(d) { return d.src_port_code === current_origin_id })
+			 //.filter(function(d) { return d.src_port_code === "JFK" })
 	     .filter(function(d) { return d.trip_dist < current_max_dist })
 	     .attr("d", function(d) {
 			 return flight_viz_lib.path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
@@ -65,7 +74,8 @@ flight_viz_lib.distmapPlot = function(){
     var publicObjs = {
 		plot_airport_routes: routes_from_airport_,
 		update_airline: update_current_airline_id_,
-		update_distance: update_max_dist_
+		update_distance: update_max_dist_,
+		update_origin: update_current_origin_id_
     };
 
     return publicObjs;
@@ -342,6 +352,28 @@ Promise.all([
       };
 
     });
+
+			//autofill for origin
+			$.getJSON('./Data/toproutes.json', function(data) {
+			  $( "#originName" ).autocomplete({
+			  source: data,
+			  select: function(event, ui) {
+				  //console.log(ui.item.label);
+				  distmap.update_origin(ui.item.label);
+				  routes.searched(ui.item.label);
+			          $(this).val("");
+			          return false;
+			      }
+			  });
+
+			$.ui.autocomplete.filter = function (array, term) {
+					var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(term), "i");
+					return $.grep(array, function (value) {
+							return matcher.test(value.label || value.value || value);
+					});
+			};
+
+		});
 
 }).catch(function(err) {
     // handle error here
