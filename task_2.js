@@ -45,7 +45,10 @@ flight_viz_lib.planesData = function() {
     const width = 1000 - 2 * margin;
     const height = 600 - 2 * margin;
 
-    const svg = d3.select('svg');
+    const svg = d3.select("#planeChart")
+      .append("svg")
+      .attr('width', width)
+      .attr('height', height);
 
     const chart = svg.append('g')
         .attr('transform', `translate(${margin}, ${margin})`);
