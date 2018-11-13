@@ -4,33 +4,31 @@
 <head>
   <meta charset="UTF-8">
   <title>Flight Visualization</title>
-      <link rel="stylesheet" href="css/jquery-ui.min.css">
       <link rel="stylesheet" href="css/flight.css">
 </head>
 
 <div id="routemap" class="routemap"></div>
+<div id="planeChart" class="planeChart"></div>
 <div id="airlines">
   <div class="airline-select" id="button-header">Choose an airline:</div>
-  <button class="airline-select" data-airlineid="24">AA</button>
-  <button class="airline-select" data-airlineid="2009">DL</button>
-   <button class="airline-select" data-airlineid="5209">UA</button>
-  <button class="airline-select" data-airlineid="3320">LH</button>
-  <button class="airline-select" data-airlineid="137">AF</button>
-  <input id="airlineName"  placeholder="Search for airlines ...">
-  <input id="originName"  placeholder="Search for origin ...">
-  <input type="number" min="100" max="15000" step="100" value="10000" id="nValue">
+  <button class="airline-select" data-airlineid="24" data-airline_code="AA">AA</button>
+  <button class="airline-select" data-airlineid="2009" data-airline_code="DL">DL</button>
+  <button class="airline-select" data-airlineid="5209" data-airline_code="UA">UA</button>
+  <button class="airline-select" data-airlineid="3320" data-airline_code="LH">LH</button>
+  <button class="airline-select" data-airlineid="137" data-airline_code="AF">AF</button>
+  <textarea id="airlineName" name="txt-Name" placeholder="Search for airlines ..."></textarea>
+  <button id="search">Search</button>
   <button id="clear">Clear</button>
-  </div>
+  <br />
+  <svg />
 </div>
 
-
 <script src='js/jquery.min.js'></script>
-<script src='js/jquery-ui.min.js'></script>
 <script src='js/d3.min.js'></script>
 <script src="js/topojson.min.js"></script>
 <script src="js/d3-geo.min.js"></script>
 <script src="js/d3-geo-projection.v2.min.js"></script>
-<script src="js/flight.js"></script>
+<script src="js/task_2.js"></script>
 </body>
 
 </html>
