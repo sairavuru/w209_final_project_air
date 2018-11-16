@@ -133,7 +133,19 @@ flight_viz_lib.planesData = function() {
   //take the airline as an arguments
   //get the airline from the button click
   function planesCount(airline_code){
-    let plane_counts = {};
+    let plane_counts = {
+        boeing_single_aisle: 0,
+        boeing_twin_aisle: 0,
+        airbus_single_aisle: 0,
+        airbus_twin_aisle: 0,
+        aerospatiale_regional_jet: 0,
+        embraer_regional_jet: 0,
+        canadair_regional_jet: 0,
+        de_havilland_regional_jet: 0,
+        mcDonnell_douglas: 0,
+        other: 0,
+        none: 0
+    };
     //like a dictionary in Python with key value pairs
     routesData.forEach(
       function (route) {
@@ -141,8 +153,11 @@ flight_viz_lib.planesData = function() {
         //to plane_counts if doesn't already exist
         //or update counts
         if (airline_code === route.airline_code){
+
+          console.log(route.equipment.substring(0,2));
+
           console.log(route.airline_code)
-          route.equipment.split(" ").forEach(
+/*          route.equipment.split(" ").forEach(
             function (equip) {
               if (plane_counts[equip]  === undefined){
                 plane_counts[equip] = 1;
@@ -151,7 +166,7 @@ flight_viz_lib.planesData = function() {
                 plane_counts[equip]++;
               }
             }
-          );
+          );*/
         }
       }
     );
