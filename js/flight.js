@@ -3,7 +3,7 @@ var flight_viz_lib = flight_viz_lib || {};
 flight_viz_lib = {
 	routesData : [],
 	airportData : [],
-	routesWithLocations:[],
+	finalMergedRoutes:[],
 	width:1200,
 	height:600
 };
@@ -20,6 +20,77 @@ flight_viz_lib.projection = d3.geoRobinson()
 flight_viz_lib.path = d3.geoPath()
     .projection(flight_viz_lib.projection)
     .pointRadius(1);
+
+flight_viz_lib.data = function(rd, pd) {
+	flight_viz_lib.routesData = rd;
+	flight_viz_lib.airportData = pd;
+
+	function addLocations(airports, routes) {
+		var l = airports.length,
+			m = routes.length,
+			lookupIndex = {},
+			output = [];
+		for (var i = 0; i < l; i++) { // loop through airports
+			var row = airports[i];
+			lookupIndex[row.airport_ID] = row; // create an index for lookup table
+		}
+		for (var j = 0; j < m; j++) { // loop through routes
+			var y = routes[j];
+			if (isNaN(y.src_port_id) || isNaN(y.dest_port_id) || !(y.src_port_id in lookupIndex) || !(y.dest_port_id in lookupIndex)) {
+				continue;
+			}
+			var src = lookupIndex[y.src_port_id];
+			var dest = lookupIndex[y.dest_port_id];
+
+			function distance(lat1, lon1, lat2, lon2, unit) {
+				if ((lat1 == lat2) && (lon1 == lon2)) {
+					return 0;
+				} else {
+					var radlat1 = Math.PI * lat1 / 180;
+					var radlat2 = Math.PI * lat2 / 180;
+					var theta = lon1 - lon2;
+					var radtheta = Math.PI * theta / 180;
+					var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+					if (dist > 1) {
+						dist = 1;
+					}
+					dist = Math.acos(dist);
+					dist = dist * 180 / Math.PI;
+					dist = dist * 60 * 1.1515;
+					if (unit == "K") {
+						dist = dist * 1.609344
+					}
+					if (unit == "N") {
+						dist = dist * 0.8684
+					}
+					return dist;
+				}
+			}
+
+			var item = {
+				airline_code: y.airline_code,
+				airline_ID: y.airline_ID,
+				src_port_code: y.src_port_code,
+				src_port_id: y.src_port_id,
+				src_lat: src.lat,
+				src_long: src.long,
+				dest_port_code: y.dest_port_code,
+				dest_port_id: y.dest_port_id,
+				dest_lat: dest.lat,
+				dest_long: dest.long,
+				trip_dist: distance(src.lat, src.long, dest.lat, dest.long, "N"),
+				code_share: y.code_share,
+				stops: y.stops,
+				equipment: y.equipment
+			};
+			output.push(item);
+		} // end of loop routes
+		return output;
+	};
+
+	flight_viz_lib.finalMergedRoutes = addLocations(pd, rd);
+};
+
 //end of common variables
 
 // Start Task 3
@@ -49,7 +120,7 @@ flight_viz_lib.distmapPlot = function(){
 // the following code is temporary for proof-of concept
 	     var links = flight_viz_lib.svg.append("g").attr("id", "flights")
 	     .selectAll("path.flight")
-	     .data(flight_viz_lib.routesWithLocations)
+	     .data(flight_viz_lib.finalMergedRoutes)
 	     .enter()
 	     .append("path")
 		   .filter(function(d) { return d.airline_ID === current_airline_id })
@@ -252,6 +323,7 @@ flight_viz_lib.planesData = function() {
               }
             }
           );*/
+
         }
       }
     );
@@ -282,72 +354,6 @@ flight_viz_lib.planesData = function() {
 flight_viz_lib.routemapPlot = function() {
 
   var g = flight_viz_lib.svg.append("g");
-
-  var data_ = function(rd, pd) {
-    var that = this;
-    if (!arguments.length) return that;
-    flight_viz_lib.routesData = rd;
-    flight_viz_lib.airportData = pd;
-
-    function addLocations(airports, routes) {
-        var l = airports.length,
-            m = routes.length,
-		    lookupIndex = {},
-            output = [];
-        for (var i = 0; i < l; i++) { // loop through airports
-            var row = airports[i];
-            lookupIndex[row.airport_ID] = row; // create an index for lookup table
-        }
-        for (var j = 0; j < m; j++) { // loop through routes
-            var y = routes[j];
-			if (isNaN(y.src_port_id)|| isNaN(y.dest_port_id) || !(y.src_port_id in lookupIndex) ||  !(y.dest_port_id in lookupIndex) ) { continue; }
-            var src = lookupIndex[y.src_port_id];
-			var dest = lookupIndex[y.dest_port_id];
-
-      function distance(lat1, lon1, lat2, lon2, unit) {
-        	if ((lat1 == lat2) && (lon1 == lon2)) {
-        		return 0;
-        	}
-        	else {
-        		var radlat1 = Math.PI * lat1/180;
-        		var radlat2 = Math.PI * lat2/180;
-        		var theta = lon1-lon2;
-        		var radtheta = Math.PI * theta/180;
-        		var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-        		if (dist > 1) {
-        			dist = 1;
-        		}
-        		dist = Math.acos(dist);
-        		dist = dist * 180/Math.PI;
-        		dist = dist * 60 * 1.1515;
-        		if (unit=="K") { dist = dist * 1.609344 }
-        		if (unit=="N") { dist = dist * 0.8684 }
-        		return dist;
-        	}
-        }
-
-			var item = { airline_code: y.airline_code,
-				airline_ID: y.airline_ID,
-				src_port_code: y.src_port_code,
-				src_port_id: y.src_port_id,
-				src_lat: src.lat,
-				src_long: src.long,
-				dest_port_code: y.dest_port_code,
-				dest_port_id: y.dest_port_id,
-				dest_lat: dest.lat,
-				dest_long: dest.long,
-        trip_dist: distance(src.lat, src.long, dest.lat, dest.long, "N"),
-				code_share: y.code_share,
-				stops: y.stops,
-				equipment: y.equipment};
-            output.push(item);
-        }
-		console.log("output");
-        return output;
-    };
-	flight_viz_lib.routesWithLocations = addLocations(pd, rd);
-    return that;
-  };
 
   var worldmap_ = function() {
     d3.json("./Data/worldmap.json").then(function(topology) {
@@ -390,7 +396,7 @@ flight_viz_lib.routemapPlot = function() {
   var routemap_for_id_ = function (airlineID) {
       var links = flight_viz_lib.svg.append("g").attr("id", "flights")
       .selectAll("path.flight")
-      .data(flight_viz_lib.routesWithLocations)
+      .data(flight_viz_lib.finalMergedRoutes)
       .enter()
       .append("path")
  	 .filter(function(d) { return d.airline_ID === airlineID })
@@ -443,7 +449,6 @@ flight_viz_lib.routemapPlot = function() {
   };
 
   var publicObjs = {
-    data: data_,
     plotworld: worldmap_,
     clearmap: clear_routes_,
 	searched: routemap_for_searched_,
@@ -516,7 +521,7 @@ Promise.all([
         icao_name: d[2]};
     });
     // route map plot
-    routes.data(routesData, airportData);
+    flight_viz_lib.data(routesData, airportData);
     routes.plotworld();
 
 	// Button listener
