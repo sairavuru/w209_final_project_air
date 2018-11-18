@@ -1,5 +1,5 @@
 var flight_viz_lib = flight_viz_lib || {};
-
+// Common variables across all tasks
 flight_viz_lib = {
 	routesData : [],
 	airportData : [],
@@ -20,7 +20,9 @@ flight_viz_lib.projection = d3.geoRobinson()
 flight_viz_lib.path = d3.geoPath()
     .projection(flight_viz_lib.projection)
     .pointRadius(1);
+//end of common variables
 
+// Start Task 3
 flight_viz_lib.distmapPlot = function(){
 
     var current_airline_id = -1;
@@ -80,7 +82,203 @@ flight_viz_lib.distmapPlot = function(){
 
     return publicObjs;
 };
+// End of Task 3
 
+// Start Task 2
+flight_viz_lib.planesData = function() {
+  //fill this in
+
+  //filter the correct data by airlines
+  //join the data from the two different csv files
+  //equipment ID and correct name from planes data
+  //group by equipment ID to count the airplanes
+
+  //create the bar chart based on the counts
+  //clear bar chart
+  var routesData = [];
+  var planesData = [];
+
+  var barChart = function(tally, pd) {
+    //extract top 10 from the object
+    //convert to array and sort by values
+    //make an array only of the top 10 values
+    var orderedPlaneCounts = Object.keys(tally).map(
+      function (equip) {
+        return [equip, tally[equip]];
+      }
+    ).sort(function (a, b) { return b[1] - a[1];}).slice(0, 10);
+
+    //this part is attempting to extract the planes' names
+    //using the equipment code
+    /*
+    var planeNames = orderedPlaneCounts.map(
+      function (pair) {
+        var planeObj = planesData.filter(
+          function (plane) {
+            return plane.iata_name === pair[0];
+          }
+        );
+        console.log(planeObj);
+        return pair.concat([planeObj[0].aircraft_name]);
+      }
+    );
+    console.log(planeNames);
+    */
+
+
+    const margin = 60;
+    const width = 1000 - 2 * margin;
+    const height = 600 - 2 * margin;
+
+    const svg = d3.select("#planeChart")
+      .append("svg")
+      .attr('width', width)
+      .attr('height', height);
+
+    const chart = svg.append('g')
+        .attr('transform', `translate(${margin}, ${margin})`);
+
+    const yScale = d3.scaleLinear()
+        .range([height, 0])
+        .domain([0, orderedPlaneCounts[0][1] * 1.1]);
+
+    chart.append('g')
+        .call(d3.axisLeft(yScale));
+
+    const xScale = d3.scaleBand()
+        .range([0, width])
+        .domain(orderedPlaneCounts.map((s) => s[0]))
+        .padding(0.2)
+
+    chart.append('g')
+        .attr('transform', `translate(0, ${height})`)
+        .call(d3.axisBottom(xScale));
+
+
+    chart.selectAll()
+        .data(orderedPlaneCounts)
+        .enter()
+        .append('rect')
+        .attr('x', (s) => xScale(s[0]))
+        .attr('y', (s) => yScale(s[1]))
+        .attr('height', (s) => height - yScale(s[1]))
+        .attr('width', xScale.bandwidth());
+
+    chart.append('g')
+        .attr('class', 'grid')
+        .attr('transform', `translate(0, ${height})`)
+        .call(d3.axisBottom()
+            .scale(xScale)
+            .tickSize(-height, 0, 0)
+            .tickFormat(''));
+
+
+    chart.append('g')
+        .attr('class', 'grid')
+        .call(d3.axisLeft()
+            .scale(yScale)
+            .tickSize(-width, 0, 0)
+            .tickFormat(''));
+
+    chart.selectAll()
+        .data(orderedPlaneCounts)
+        .enter()
+        .append('rect')
+        .attr('x', (s) => xScale(s[0]))
+        .attr('y', (s) => yScale(s[1]))
+        .attr('height', (s) => height - yScale(s[1]))
+        .attr('width', xScale.bandwidth());
+
+    svg.append('text')
+        .attr('x', -(height / 2) - margin)
+        .attr('y', margin / 2.4)
+        .attr('transform', 'rotate(-90)')
+        .attr('text-anchor', 'middle')
+        .text('Number of Routes')
+
+    svg.append('text')
+        .attr('x', width / 2 + margin)
+        .attr('y', 40)
+        .attr('text-anchor', 'middle')
+        .text('Type of Airplane')
+  };
+
+
+  var makeChart_ = function() {
+    var airline = this.dataset.airline_code;
+    console.log(airline);
+    var tally = planesCount(airline);
+    //first sort the planesCount object (keys and values)
+    //chooose the top 10
+    //
+    barChart(tally);
+
+  };
+
+  //take the airline as an arguments
+  //get the airline from the button click
+  function planesCount(airline_code){
+    let plane_counts = {
+        boeing_single_aisle: 0,
+        boeing_twin_aisle: 0,
+        airbus_single_aisle: 0,
+        airbus_twin_aisle: 0,
+        aerospatiale_regional_jet: 0,
+        embraer_regional_jet: 0,
+        canadair_regional_jet: 0,
+        de_havilland_regional_jet: 0,
+        mcDonnell_douglas: 0,
+        other: 0,
+        none: 0
+    };
+    //like a dictionary in Python with key value pairs
+    routesData.forEach(
+      function (route) {
+        //get the equipment id from routes, add this as key
+        //to plane_counts if doesn't already exist
+        //or update counts
+        if (airline_code === route.airline_code){
+
+          console.log(route.equipment.substring(0,2));
+
+          console.log(route.airline_code)
+/*          route.equipment.split(" ").forEach(
+            function (equip) {
+              if (plane_counts[equip]  === undefined){
+                plane_counts[equip] = 1;
+              }
+              else {
+                plane_counts[equip]++;
+              }
+            }
+          );*/
+        }
+      }
+    );
+    return plane_counts;
+  };
+  var data_ = function(rd, pd) {
+    //csv files have already been parsed into arrays
+    //arrays of objects with attributes
+    routesData = rd;
+    planesData = pd;
+    console.log(planesData);
+    console.log(routesData);
+    //we are now entering this function
+    console.log("data function");
+  };
+
+  //what does this part do?
+  var publicObjs = {
+    data: data_,
+    makeChart: makeChart_
+  };
+
+  return publicObjs;
+}
+// End of Task 2
+
+// Start of Task 1
 flight_viz_lib.routemapPlot = function() {
 
   var g = flight_viz_lib.svg.append("g");
