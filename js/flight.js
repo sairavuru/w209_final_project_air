@@ -568,6 +568,9 @@ routes.filterctl(fc);
 barchart.filterctl(fc);
 distmap.filterctl(fc);
 
+// initialize the default selction of route plot
+$('input:radio[name=routetype]:nth(0)').attr('checked',true);
+
 Promise.all([
     d3.text("./Data/routes.csv"),
     d3.text("./Data/airlines.csv"),
@@ -636,6 +639,11 @@ Promise.all([
     d3.select("#nValue").on("input", function() {
       distmap.update_distance(+this.value);
       distmap.plot_airport_routes();
+    });
+
+	// display configurations
+    $("#showConfig").click(function () {
+		alert($('input:radio[name=routetype]:checked').val());
     });
 
     //autofill for airlines

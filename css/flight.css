@@ -28,6 +28,7 @@ path {
     position: relative;
   }
   div.filter-prompt {
+    top-padding: 20px;
     display: inline-block;
     font-size: 0.8em;
   }
