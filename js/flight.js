@@ -67,6 +67,36 @@ flight_viz_lib.data = function(rd, pd) {
 				}
 			}
 
+			function equipment_classification(equip) {
+				var airplane_type = "";
+				if (isNaN(equip)) {
+					airplane_type = "None";
+					return airplane_type;
+				}
+				if (equip.substring(0, 2) === "73" || equip.substring(0, 2) === "7M") {
+					airplane_type = "Boeing single aisle";
+				} else if (equip.substring(0, 2) === "31" || equip.substring(0, 2) === "32") {
+					airplane_type = "Airbus single aisle";
+				} else if (equip.substring(0, 2) === "74" || equip.substring(0, 2) === "75" || equip.substring(0, 2) === "76" || equip.substring(0, 2) === "77" || equip.substring(0, 2) === "78") {
+					airplane_type = "Boeing twin aisle";
+				} else if (equip.substring(0, 2) === "33" || equip.substring(0, 2) === "34" || equip.substring(0, 2) === "35" || equip.substring(0, 2) === "38") {
+					airplane_type = "Airbus twin aisle";
+				} else if (equip.substring(0, 2) === "AT") {
+					airplane_type = "Aerospatiale Regional Jet";
+				} else if (equip.substring(0, 1) === "E") {
+					airplane_type = "Embraer Regional Jet";
+				} else if (equip.substring(0, 2) === "CR") {
+					airplane_type = "Canadair Regional Jet";
+				} else if (equip.substring(0, 2) === "DH") {
+					airplane_type = "De Havilland Canada Regional Jet";
+				} else if (equip.substring(0, 2) === "M1" || equip.substring(0, 2) === "M8" || equip.substring(0, 2) === "M9" || equip.substring(0, 2) === "D1" || equip.substring(0, 2) === "D3" || equip.substring(0, 2) === "D6" || equip.substring(0, 2) === "D9") {
+					airplane_type = "McDonnell Douglas (merged with Boeing)";
+				} else {
+					airplane_type = "Other";
+				}
+				return airplane_type;
+			}
+
 			var item = {
 				airline_code: y.airline_code,
 				airline_ID: y.airline_ID,
@@ -81,7 +111,8 @@ flight_viz_lib.data = function(rd, pd) {
 				trip_dist: distance(src.lat, src.long, dest.lat, dest.long, "N"),
 				code_share: y.code_share,
 				stops: y.stops,
-				equipment: y.equipment
+				equipment: y.equipment,
+				airplane_type: equipment_classification(y.equipment)
 			};
 			output.push(item);
 		} // end of loop routes
