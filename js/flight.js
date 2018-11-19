@@ -125,7 +125,7 @@ flight_viz_lib.data = function(rd, pd) {
 
 flight_viz_lib.filterControl = function(){
 	var airline_id_filter = 99999;
-	var origin_airport_filter = "";
+	var origin_airport_filter = "ZZZ";
 	var max_dist_filter = 10000;
 
     var routemapcb = function() {};
@@ -572,124 +572,129 @@ distmap.filterctl(fc);
 $('input:radio[name=routetype]:nth(0)').attr('checked',true);
 
 Promise.all([
-    d3.text("./Data/routes.csv"),
-    d3.text("./Data/airlines.csv"),
-    d3.text("./Data/airports.csv"),
-    d3.text("./Data/planes.csv")
+	d3.text("./Data/routes.csv"),
+	d3.text("./Data/airlines.csv"),
+	d3.text("./Data/airports.csv"),
+	d3.text("./Data/planes.csv")
 ]).then(function(files) {
-    //get all data
-    var routesData = d3.csvParseRows(files[0], function(d, i) {
-        return {
-        airline_code: d[0],
-        airline_ID: +d[1],
-        src_port_code: d[2],
-        src_port_id: +d[3],
-        dest_port_code: d[4],
-        dest_port_id: +d[5],
-        code_share: d[6],
-        stops: +d[7],
-        equipment: d[8]};
-    });
+	//get all data
+	var routesData = d3.csvParseRows(files[0], function(d, i) {
+		return {
+			airline_code: d[0],
+			airline_ID: +d[1],
+			src_port_code: d[2],
+			src_port_id: +d[3],
+			dest_port_code: d[4],
+			dest_port_id: +d[5],
+			code_share: d[6],
+			stops: +d[7],
+			equipment: d[8]
+		};
+	});
 
-    var airlineData = d3.csvParseRows(files[1], function(d, i) {
-        return {
-        airline_ID: +d[0],
-        airline_name: d[1],
-        alias: d[2],
-        iata: d[3],
-        airline_code: d[4],
-        call_sign: d[5],
-        country: d[6],
-        active: d[7]};
-    });
+	var airlineData = d3.csvParseRows(files[1], function(d, i) {
+		return {
+			airline_ID: +d[0],
+			airline_name: d[1],
+			alias: d[2],
+			iata: d[3],
+			airline_code: d[4],
+			call_sign: d[5],
+			country: d[6],
+			active: d[7]
+		};
+	});
 
-    var airportData = d3.csvParseRows(files[2], function(d, i) {
-        return {
-        airport_ID: +d[0],
-        airport_name: d[1],
-        city_name: d[2],
-        country_name: d[3],
-        iata_code: d[4],
-        icao_code: d[5],
-        lat: +d[6],
-        long: +d[7],
-        altitude: +d[8],
-        tz_offset: +d[9],
-        DST: d[10],
-        tz_name: d[11],
-        airport_type: d[12],
-        source_data: d[13]};
-    });
+	var airportData = d3.csvParseRows(files[2], function(d, i) {
+		return {
+			airport_ID: +d[0],
+			airport_name: d[1],
+			city_name: d[2],
+			country_name: d[3],
+			iata_code: d[4],
+			icao_code: d[5],
+			lat: +d[6],
+			long: +d[7],
+			altitude: +d[8],
+			tz_offset: +d[9],
+			DST: d[10],
+			tz_name: d[11],
+			airport_type: d[12],
+			source_data: d[13]
+		};
+	});
 
-    var planesData = d3.csvParseRows(files[3], function(d, i) {
-        return {
-        aircraft_name: d[0],
-        iata_name: d[1],
-        icao_name: d[2]};
-    });
-    // route map plot
-    flight_viz_lib.data(routesData, airportData);
-    routes.plotworld();
+	var planesData = d3.csvParseRows(files[3], function(d, i) {
+		return {
+			aircraft_name: d[0],
+			iata_name: d[1],
+			icao_name: d[2]
+		};
+	});
+	// route map plot
+	flight_viz_lib.data(routesData, airportData);
+	routes.plotworld();
 
 	// Button listener
-    d3.selectAll('button.airline-select').on('mousedown', fc.set_airline);
-    d3.select('#clear').on('mousedown', routes.clearmap);
+	d3.selectAll('button.airline-select').on('mousedown', fc.set_airline);
+	d3.select('#clear').on('mousedown', routes.clearmap);
 
-    //input for distance filtering
-    d3.select("#nValue").on("input", function() {
-      distmap.update_distance(+this.value);
-      distmap.plot_airport_routes();
-    });
+	//input for distance filtering
+	d3.select("#nValue").on("input", function() {
+		distmap.update_distance(+this.value);
+		distmap.plot_airport_routes();
+	});
 
 	// display configurations
-    $("#showConfig").click(function () {
+	$("#showConfig").click(function() {
 		alert($('input:radio[name=routetype]:checked').val());
-    });
+	});
 
-    //autofill for airlines
-    $.getJSON('./Data/topairlines.json', function(data) {
-      $( "#airlineName" ).autocomplete({
-		  source: data,
-      select: function(event, ui) {
-			  console.log(ui.item.id);
-			  distmap.update_airline(parseInt(ui.item.id));
-			  routes.searched(parseInt(ui.item.id));
-              $(this).val("");
-              return false;
-          }
-      });
-
-      $.ui.autocomplete.filter = function (array, term) {
-          var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(term), "i");
-          return $.grep(array, function (value) {
-              return matcher.test(value.label || value.value || value);
-          });
-      };
-
-    });
-
-			//autofill for origin
-			$.getJSON('./Data/toproutes.json', function(data) {
-			  $( "#originName" ).autocomplete({
-			  source: data,
-			  select: function(event, ui) {
-				  //console.log(ui.item.label);
-				  distmap.update_origin(ui.item.label);
-				  distmap.plot_airport_routes();
-			          $(this).val("");
-			          return false;
-			      }
-			  });
-
-			$.ui.autocomplete.filter = function (array, term) {
-					var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(term), "i");
-					return $.grep(array, function (value) {
-							return matcher.test(value.label || value.value || value);
-					});
-			};
-
+	//autofill for airlines
+	$.getJSON('./Data/topairlines.json', function(data) {
+		$("#airlineName").autocomplete({
+			source: data,
+			select: function(event, ui) {
+				console.log(ui.item.id);
+				distmap.update_airline(parseInt(ui.item.id));
+				routes.searched(parseInt(ui.item.id));
+				$(this).val("");
+				return false;
+			}
 		});
 
+		$.ui.autocomplete.filter = function(array, term) {
+			var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(term), "i");
+			return $.grep(array, function(value) {
+				return matcher.test(value.label || value.value || value);
+			});
+		};
+
+	});
+
+	//autofill for origin
+	$.getJSON('./Data/toproutes.json', function(data) {
+		$("#originName").autocomplete({
+			source: data,
+			select: function(event, ui) {
+				//console.log(ui.item.label);
+				distmap.update_origin(ui.item.label);
+				distmap.plot_airport_routes();
+				$(this).val("");
+				return false;
+			}
+		});
+
+		$.ui.autocomplete.filter = function(array, term) {
+			var matcher = new RegExp("^" + $.ui.autocomplete.escapeRegex(term), "i");
+			return $.grep(array, function(value) {
+				return matcher.test(value.label || value.value || value);
+			});
+		};
+
+	});
+
 }).catch(function(err) {
-    // handle error here
+	// handle error here
 })
+
