@@ -3,6 +3,7 @@ var flight_viz_lib = flight_viz_lib || {};
 flight_viz_lib = {
 	routesData : [],
 	airportData : [],
+	airlineData : [],
 	finalMergedRoutes:[],
 	selectedRoutes:[],
 	width:1200,
@@ -22,9 +23,10 @@ flight_viz_lib.path = d3.geoPath()
     .projection(flight_viz_lib.projection)
     .pointRadius(1);
 
-flight_viz_lib.data = function(rd, pd) {
+flight_viz_lib.data = function(rd, pd, ad) {
 	flight_viz_lib.routesData = rd;
 	flight_viz_lib.airportData = pd;
+	flight_viz_lib.airlineData = ad;
 
 	function addLocations(airports, routes) {
 		var l = airports.length,
@@ -124,8 +126,11 @@ flight_viz_lib.data = function(rd, pd) {
 };
 
 flight_viz_lib.filterControl = function(){
-	var airline_id_filter = 99999;
-	var origin_airport_filter = "ZZZ";
+	const no_airline_selected = -1;
+	const no_src_port_selected = "ZZZ"
+
+	var airline_id_filter = no_airline_selected;
+	var origin_airport_filter = no_src_port_selected;
 	var max_dist_filter = 10000;
 
     var routemapcb = function() {};
@@ -160,14 +165,46 @@ flight_viz_lib.filterControl = function(){
 
       airline_id_filter = parseInt(this.dataset.airlineid);
 //distmapcb.update_airline(airline_ID);
-      routemapcb.plotroutes(airline_id_filter);
+      if ($('input:radio[name=routetype]:checked').val() === "Airline Routes"){
+		  routemapcb.plotroutes(airline_id_filter);
+      }
+	  showconf_();
     };
+
+	var resetfilters_ = function(){
+		airline_id_filter = no_airline_selected;
+		origin_airport_filter = no_src_port_selected;
+		max_dist_filter = 10000;
+		showconf_();
+	}
+
+	var showconf_ = function(){
+		$("#ctl-config").empty();
+		conf = "Mode: " + $('input:radio[name=routetype]:checked').val() + "</br>";
+		if (airline_id_filter === no_airline_selected) {
+			conf = conf + "Airline: Not selected </br>";
+		}
+		else {
+			const airline = flight_viz_lib.airlineData
+			                .find( a => a.airline_ID === airline_id_filter);
+			conf = conf + "Airline ID: " + airline.airline_name + "</br>";
+		}
+		if (origin_airport_filter === no_src_port_selected){
+			conf = conf + "Originating airport: Not selected </br>";
+		}
+		else {
+			conf = conf + "Originating airport"+ origin_airport_filter + "</br>";
+		}
+		$("#ctl-config").append( "<p>" + conf + "</p>" );
+	}
 
     var publicObjs = {
 		set_airline: airline_button_,
 		barchart: barchartcb_,
 		distmap: distmapcb_,
-		routemap: routemapcb_
+		routemap: routemapcb_,
+		resetfilters: resetfilters_,
+		showconf: showconf_
     };
 
     return publicObjs;
@@ -537,6 +574,7 @@ flight_viz_lib.routemapPlot = function() {
 	  d3.selectAll('button').style('background-color', '#f7f7f7');
 	  d3.select(this).style('background-color', '#ddd');
       d3.selectAll("#flights").remove();
+	  filterctlcb.resetfilters();
   };
 
   var filterctlcb = function() {};
@@ -570,6 +608,7 @@ distmap.filterctl(fc);
 
 // initialize the default selction of route plot
 $('input:radio[name=routetype]:nth(0)').attr('checked',true);
+fc.showconf();
 
 Promise.all([
 	d3.text("./Data/routes.csv"),
@@ -632,7 +671,7 @@ Promise.all([
 		};
 	});
 	// route map plot
-	flight_viz_lib.data(routesData, airportData);
+	flight_viz_lib.data(routesData, airportData, airlineData);
 	routes.plotworld();
 
 	// Button listener
@@ -643,11 +682,6 @@ Promise.all([
 	d3.select("#nValue").on("input", function() {
 		distmap.update_distance(+this.value);
 		distmap.plot_airport_routes();
-	});
-
-	// display configurations
-	$("#showConfig").click(function() {
-		alert($('input:radio[name=routetype]:checked').val());
 	});
 
 	//autofill for airlines
