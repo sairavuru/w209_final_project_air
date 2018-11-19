@@ -4,6 +4,7 @@ flight_viz_lib = {
 	routesData : [],
 	airportData : [],
 	finalMergedRoutes:[],
+	selectedRoutes:[],
 	width:1200,
 	height:600
 };
@@ -122,6 +123,44 @@ flight_viz_lib.data = function(rd, pd) {
 	flight_viz_lib.finalMergedRoutes = addLocations(pd, rd);
 };
 
+flight_viz_lib.filterControl = function(){
+	var airline_id_filter = 99999;
+	var origin_airport_filter = "";
+	var max_dist_filter = 10000;
+
+    var routemapcb = function() {};
+    var routemapcb_ = function(_) {
+        var that = this;
+        if (!arguments.length) return routemapcb;
+        routemapcb = _;
+        return that;
+    };
+
+    var barchartcb = function() {};
+    var barchartcb_ = function(_) {
+        var that = this;
+        if (!arguments.length) return barchartcb;
+        barchartcb = _;
+        return that;
+    };
+
+    var distmapcb = function() {};
+    var distmapcb_ = function(_) {
+        var that = this;
+        if (!arguments.length) return distmapcb;
+        distmapcb = _;
+        return that;
+    };
+
+    var publicObjs = {
+		barchart: barchartcb_,
+		distmap: distmapcb_,
+		routemap: routemapcb_
+    };
+
+    return publicObjs;
+};
+
 //end of common variables
 
 // Start Task 3
@@ -175,11 +214,20 @@ flight_viz_lib.distmapPlot = function(){
 	     .style("stroke-opacity", 0.2);
 	};
 
+    var filterctlcb = function() {};
+    var filterctlcb_ = function(_) {
+        var that = this;
+        if (!arguments.length) return filterctlcb;
+        filterctlcb = _;
+        return that;
+    };
+
     var publicObjs = {
 		plot_airport_routes: routes_from_airport_,
 		update_airline: update_current_airline_id_,
 		update_distance: update_max_dist_,
-		update_origin: update_current_origin_id_
+		update_origin: update_current_origin_id_,
+		filterctl: filterctlcb_
     };
 
     return publicObjs;
@@ -382,9 +430,18 @@ flight_viz_lib.planesData = function() {
   	return plane_counts;
   };
 
+  var filterctlcb = function() {};
+  var filterctlcb_ = function(_) {
+      var that = this;
+      if (!arguments.length) return filterctlcb;
+      filterctlcb = _;
+      return that;
+  };
+
   //what does this part do?
   var publicObjs = {
-    makeChart: makeChart_
+    makeChart: makeChart_,
+	filterctl: filterctlcb_
   };
 
   return publicObjs;
@@ -481,11 +538,11 @@ flight_viz_lib.routemapPlot = function() {
       d3.selectAll("#flights").remove();
   };
 
-  var distmapcb = function() {};
-  var distmapcb_ = function(_) {
+  var filterctlcb = function() {};
+  var filterctlcb_ = function(_) {
       var that = this;
-      if (!arguments.length) return distmapcb;
-      distmapcb = _;
+      if (!arguments.length) return filterctlcb;
+      filterctlcb = _;
       return that;
   };
 
@@ -494,16 +551,21 @@ flight_viz_lib.routemapPlot = function() {
     clearmap: clear_routes_,
 	searched: routemap_for_searched_,
     plotroutes: routemap_,
-	distmap: distmapcb_
+	filterctl: filterctlcb_
   };
 
   return publicObjs;
 };
 
-// route map viz
+// link all call back functions
 var routes = flight_viz_lib.routemapPlot();
 var distmap = flight_viz_lib.distmapPlot();
-routes.distmap(distmap);
+var barchart = flight_viz_lib.planesData();
+var fc = flight_viz_lib.filterControl();
+fc.routemap(routes).distmap(distmap).barchart(barchart);
+routes.filterctl(fc);
+barchart.filterctl(fc);
+distmap.filterctl(fc);
 
 Promise.all([
     d3.text("./Data/routes.csv"),
