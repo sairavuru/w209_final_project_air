@@ -8,22 +8,35 @@
       <link rel="stylesheet" href="css/flight.css">
 </head>
 
-<div id="routemap" class="routemap"></div>
-<div id="airlines">
-  <div class="airline-select" id="button-header">Choose an airline:</div>
-  <button class="airline-select" data-airlineid="24">AA</button>
-  <button class="airline-select" data-airlineid="2009">DL</button>
-   <button class="airline-select" data-airlineid="5209">UA</button>
-  <button class="airline-select" data-airlineid="3320">LH</button>
-  <button class="airline-select" data-airlineid="137">AF</button>
-  <input id="airlineName"  placeholder="Search for airlines ...">
-  <input id="originName"  placeholder="Search for origin ...">
-  <input type="number" min="100" max="15000" step="100" value="10000" id="nValue">
-  <button id="clear">Clear</button>
-  </div>
+<div class="container">
+   <div id="routemap" class="routemap"></div>
+   <div id="controls" class="controls">
+      <div class="filter-prompt">Airline filter:</div>
+	  <div id="airlines">
+          <button class="airline-select" data-airlineid="24">AA</button>
+          <button class="airline-select" data-airlineid="2009">DL</button>
+          <button class="airline-select" data-airlineid="5209">UA</button>
+          <button class="airline-select" data-airlineid="3320">LH</button>
+          <button class="airline-select" data-airlineid="137">AF</button>
+	  </div>
+	  <div id="airline-searchbox">
+		  <input id="airlineName"  placeholder="Search for airlines ...">
+	  </div>
+	  <div class="filter-prompt">Source airport filter:</div>
+	  <div id="srcport">
+          <input id="originName"  placeholder="Search for origin ...">
+	  </div>
+	  <div class="filter-prompt">Range filter:</div>
+	  <div id="distance">
+          <input type="number" min="100" max="15000" step="100" value="10000" id="nValue">
+	  </div>
+	  <div id="resetmap">
+        <button id="clear">Clear</button>
+      </div>
+	  <div class="clearfix"></div>
+   </div>
+   <div id="planeChart" class="planeChart"></div>
 </div>
-<br />
-<div id="planeChart" class="planeChart"></div>
 
 <script src='js/jquery.min.js'></script>
 <script src='js/jquery-ui.min.js'></script>

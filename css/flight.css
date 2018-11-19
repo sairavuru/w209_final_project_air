@@ -4,13 +4,32 @@ path {
   fill: #778899;
 }
 
+.container {
+   width: 100%;
+   overflow: hidden;
+}
+
+.routemap {
+	width: 75%;
+    float: left;
+}
+
+.controls {
+    float: left;
+    width: 25%;
+    overflow: hidden;
+}
+
+.clearfix{
+    clear: both;
+}
+
   div#airlines {
     position: relative;
   }
-  div.airline-select {
+  div.filter-prompt {
     display: inline-block;
     font-size: 0.8em;
-    margin: 0 1em;
   }
   button {
     display: inline-block;
