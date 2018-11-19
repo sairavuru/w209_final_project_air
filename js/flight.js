@@ -319,61 +319,71 @@ flight_viz_lib.planesData = function() {
 
   //take the airline as an arguments
   //get the airline from the button click
-  function planesCount(airline_code){
-    let plane_counts = {
-        boeing_single_aisle: 0,
-        boeing_twin_aisle: 0,
-        airbus_single_aisle: 0,
-        airbus_twin_aisle: 0,
-        aerospatiale_regional_jet: 0,
-        embraer_regional_jet: 0,
-        canadair_regional_jet: 0,
-        de_havilland_regional_jet: 0,
-        mcDonnell_douglas: 0,
-        other: 0,
-        none: 0
-    };
-    //like a dictionary in Python with key value pairs
-    routesData.forEach(
-      function (route) {
-        //get the equipment id from routes, add this as key
-        //to plane_counts if doesn't already exist
-        //or update counts
-        if (airline_code === route.airline_code){
+  function planesCount(airline_code) {
+  	let plane_counts = {
+  		boeing_single_aisle: 0,
+  		boeing_twin_aisle: 0,
+  		airbus_single_aisle: 0,
+  		airbus_twin_aisle: 0,
+  		aerospatiale_regional_jet: 0,
+  		embraer_regional_jet: 0,
+  		canadair_regional_jet: 0,
+  		de_havilland_regional_jet: 0,
+  		mcDonnell_douglas: 0,
+  		other: 0,
+  		none: 0
+  	};
+  	//like a dictionary in Python with key value pairs
+  	flight_viz_lib.finalMergedRoutes.forEach(
+  		function(route) {
+  			if (airline_code === route.airline_code) {
+  				switch (route.airplane_type) {
+  					case 'Boeing single aisle':
+  						plane_counts[boeing_single_aisle]++;
+  						break;
+  					case 'Airbus single aisle':
+  						plane_counts[airbus_single_aisle]++;
+  						break;
+  					case 'Boeing twin aisle':
+  						plane_counts[boeing_twin_aisle]++;
+  						break;
+  					case 'Airbus twin aisle':
+  						plane_counts[airbus_twin_aisle]++;
+  						break;
+  					case 'Aerospatiale Regional Jet':
+  						plane_counts[aerospatiale_regional_jet]++;
+  						break;
+  					case 'Embraer Regional Jet':
+  						plane_counts[embraer_regional_jet]++;
+  						break;
+  					case 'Canadair Regional Jet':
+  						plane_counts[canadair_regional_jet]++;
+  						break;
+  					case 'De Havilland Canada Regional Jet':
+  						plane_counts[de_havilland_regional_jet]++;
+  						break;
+  					case 'McDonnell Douglas (merged with Boeing)':
+  						plane_counts[mcDonnell_douglas]++;
+  						break;
+  					case 'Other':
+  						plane_counts[other]++;
+  						break;
+  					case 'None':
+  						plane_counts[none]++;
+  						break;
+  					default:
+  						console.log(route.airplane_type);
+  				}
 
-          console.log(route.equipment.substring(0,2));
+  			}
+  		}
+  	);
 
-          console.log(route.airline_code)
-/*          route.equipment.split(" ").forEach(
-            function (equip) {
-              if (plane_counts[equip]  === undefined){
-                plane_counts[equip] = 1;
-              }
-              else {
-                plane_counts[equip]++;
-              }
-            }
-          );*/
-
-        }
-      }
-    );
-    return plane_counts;
-  };
-  var data_ = function(rd, pd) {
-    //csv files have already been parsed into arrays
-    //arrays of objects with attributes
-    routesData = rd;
-    planesData = pd;
-    console.log(planesData);
-    console.log(routesData);
-    //we are now entering this function
-    console.log("data function");
+  	return plane_counts;
   };
 
   //what does this part do?
   var publicObjs = {
-    data: data_,
     makeChart: makeChart_
   };
 
