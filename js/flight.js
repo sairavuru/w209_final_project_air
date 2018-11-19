@@ -152,7 +152,19 @@ flight_viz_lib.filterControl = function(){
         return that;
     };
 
+    var airline_button_ = function() {
+
+      d3.selectAll('button').style('background-color', '#f7f7f7');
+      d3.select(this).style('background-color', '#ddd');
+      d3.selectAll("#flights").remove();
+
+      airline_id_filter = parseInt(this.dataset.airlineid);
+//distmapcb.update_airline(airline_ID);
+      routemapcb.plotroutes(airline_id_filter);
+    };
+
     var publicObjs = {
+		set_airline: airline_button_,
 		barchart: barchartcb_,
 		distmap: distmapcb_,
 		routemap: routemapcb_
@@ -515,17 +527,6 @@ flight_viz_lib.routemapPlot = function() {
       .style("stroke-opacity", 0.2);
   };
 
-  var routemap_ = function() {
-
-    d3.selectAll('button').style('background-color', '#f7f7f7');
-    d3.select(this).style('background-color', '#ddd');
-    d3.selectAll("#flights").remove();
-
-    var airline_ID = parseInt(this.dataset.airlineid);
-	distmapcb.update_airline(airline_ID);
-    routemap_for_id_(airline_ID);
-   };
-
   var routemap_for_searched_ = function (id) {
 	  d3.selectAll('button').style('background-color', '#f7f7f7');
 	  d3.selectAll("#flights").remove();
@@ -550,7 +551,7 @@ flight_viz_lib.routemapPlot = function() {
     plotworld: worldmap_,
     clearmap: clear_routes_,
 	searched: routemap_for_searched_,
-    plotroutes: routemap_,
+    plotroutes: routemap_for_id_,
 	filterctl: filterctlcb_
   };
 
@@ -628,7 +629,7 @@ Promise.all([
     routes.plotworld();
 
 	// Button listener
-    d3.selectAll('button.airline-select').on('mousedown', routes.plotroutes);
+    d3.selectAll('button.airline-select').on('mousedown', fc.set_airline);
     d3.select('#clear').on('mousedown', routes.clearmap);
 
     //input for distance filtering
