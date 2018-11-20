@@ -164,9 +164,8 @@ flight_viz_lib.filterControl = function(){
       d3.selectAll("#flights").remove();
 
       airline_id_filter = parseInt(this.dataset.airlineid);
-//distmapcb.update_airline(airline_ID);
       if ($('input:radio[name=routetype]:checked').val() === "Airline Routes"){
-		  routemapcb.plotroutes(airline_id_filter);
+		  routemapcb.plotroutes(function(d){return d.airline_ID === airline_id_filter});
       }
 	  showconf_();
     };
@@ -540,13 +539,13 @@ flight_viz_lib.routemapPlot = function() {
    });
   };
 
-  var routemap_for_id_ = function (airlineID) {
+  var routemap_plot_ = function (func) {
       var links = flight_viz_lib.svg.append("g").attr("id", "flights")
       .selectAll("path.flight")
       .data(flight_viz_lib.finalMergedRoutes)
       .enter()
       .append("path")
- 	 .filter(function(d) { return d.airline_ID === airlineID })
+ 	 .filter(func)
       .attr("d", function(d) {
  		 return flight_viz_lib.path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
  	  })
@@ -589,7 +588,7 @@ flight_viz_lib.routemapPlot = function() {
     plotworld: worldmap_,
     clearmap: clear_routes_,
 	searched: routemap_for_searched_,
-    plotroutes: routemap_for_id_,
+    plotroutes: routemap_plot_,
 	filterctl: filterctlcb_
   };
 
