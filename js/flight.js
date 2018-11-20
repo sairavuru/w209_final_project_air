@@ -188,6 +188,13 @@ flight_viz_lib.filterControl = function(){
 	  showconf_();
     };
 
+    var airline_search_box_ = function(d){
+        d3.selectAll('button').style('background-color', '#f7f7f7');
+		airline_id_filter = d;
+		update_views_();
+		showconf_();
+    };
+
 	var resetfilters_ = function(){
 		airline_id_filter = no_airline_selected;
 		origin_airport_filter = no_src_port_selected;
@@ -217,6 +224,7 @@ flight_viz_lib.filterControl = function(){
 
     var publicObjs = {
 		set_airline: airline_button_,
+		airline_search_box: airline_search_box_,
 		set_src_port: src_port_search_,
 		barchart: barchartcb_,
 		distmap: distmapcb_,
@@ -582,12 +590,6 @@ flight_viz_lib.routemapPlot = function() {
       .style("stroke-opacity", 0.2);
   };
 
-  var routemap_for_searched_ = function (id) {
-	  d3.selectAll('button').style('background-color', '#f7f7f7');
-	  d3.selectAll("#flights").remove();
-	  routemap_for_id_ (id);
-  };
-
   var clear_routes_ = function () {
 	  d3.selectAll('button').style('background-color', '#f7f7f7');
 	  d3.select(this).style('background-color', '#ddd');
@@ -606,7 +608,6 @@ flight_viz_lib.routemapPlot = function() {
   var publicObjs = {
     plotworld: worldmap_,
     clearmap: clear_routes_,
-	searched: routemap_for_searched_,
     plotroutes: routemap_plot_,
 	filterctl: filterctlcb_
   };
@@ -708,8 +709,7 @@ Promise.all([
 			source: data,
 			select: function(event, ui) {
 				console.log(ui.item.id);
-				distmap.update_airline(parseInt(ui.item.id));
-				routes.searched(parseInt(ui.item.id));
+				fc.airline_search_box(parseInt(ui.item.id));
 				$(this).val("");
 				return false;
 			}
