@@ -205,6 +205,8 @@ flight_viz_lib.filterControl = function(){
 		airline_id_filter = no_airline_selected;
 		origin_airport_filter = no_src_port_selected;
 		max_dist_filter = 10000;
+		$("#range-slider").slider('value', max_dist_filter);
+		$("#range").val(max_dist_filter + " nautical miles.");
 		showconf_();
 	}
 
