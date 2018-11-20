@@ -5,7 +5,6 @@ flight_viz_lib = {
 	airportData : [],
 	airlineData : [],
 	finalMergedRoutes:[],
-	selectedRoutes:[],
 	width:1200,
 	height:600
 };
@@ -157,16 +156,35 @@ flight_viz_lib.filterControl = function(){
         return that;
     };
 
+	var update_views_ = function() {
+		d3.selectAll("#flights").remove();
+
+		if ($('input:radio[name=routetype]:checked').val() === "Airline Routes") {
+			if (airline_id_filter === no_airline_selected) {} else {
+				if (origin_airport_filter === no_src_port_selected) { // no src port
+					routemapcb.plotroutes(function(d) {return d.airline_ID === airline_id_filter && d.trip_dist <= max_dist_filter});
+				} else { // has src port filter
+					routemapcb.plotroutes(function(d) {return d.airline_ID === airline_id_filter && d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
+				}
+			}
+		} else { // airport routes mode
+
+		}
+	}
+
+	var src_port_search_ = function (src) {
+		origin_airport_filter = src;
+		update_views_();
+		showconf_();
+	}
+
     var airline_button_ = function() {
 
       d3.selectAll('button').style('background-color', '#f7f7f7');
       d3.select(this).style('background-color', '#ddd');
-      d3.selectAll("#flights").remove();
 
       airline_id_filter = parseInt(this.dataset.airlineid);
-      if ($('input:radio[name=routetype]:checked').val() === "Airline Routes"){
-		  routemapcb.plotroutes(function(d){return d.airline_ID === airline_id_filter});
-      }
+      update_views_();
 	  showconf_();
     };
 
@@ -192,13 +210,14 @@ flight_viz_lib.filterControl = function(){
 			conf = conf + "Originating airport: Not selected </br>";
 		}
 		else {
-			conf = conf + "Originating airport"+ origin_airport_filter + "</br>";
+			conf = conf + "Originating airport: "+ origin_airport_filter + "</br>";
 		}
 		$("#ctl-config").append( "<p>" + conf + "</p>" );
 	}
 
     var publicObjs = {
 		set_airline: airline_button_,
+		set_src_port: src_port_search_,
 		barchart: barchartcb_,
 		distmap: distmapcb_,
 		routemap: routemapcb_,
@@ -711,8 +730,7 @@ Promise.all([
 			source: data,
 			select: function(event, ui) {
 				//console.log(ui.item.label);
-				distmap.update_origin(ui.item.label);
-				distmap.plot_airport_routes();
+				fc.set_src_port(ui.item.label);
 				$(this).val("");
 				return false;
 			}
