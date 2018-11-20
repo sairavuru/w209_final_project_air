@@ -172,6 +172,12 @@ flight_viz_lib.filterControl = function(){
 		}
 	}
 
+	var update_max_dist_ = function (d) {
+		max_dist_filter = d;
+		update_views_();
+		showconf_();
+	}
+
 	var src_port_search_ = function (src) {
 		origin_airport_filter = src;
 		update_views_();
@@ -219,12 +225,14 @@ flight_viz_lib.filterControl = function(){
 		else {
 			conf = conf + "Originating airport: "+ origin_airport_filter + "</br>";
 		}
+		conf = conf + "Router distance within: " + max_dist_filter + " nautical miles</br>";
 		$("#ctl-config").append( "<p>" + conf + "</p>" );
 	}
 
     var publicObjs = {
 		set_airline: airline_button_,
 		airline_search_box: airline_search_box_,
+		set_range: update_max_dist_,
 		set_src_port: src_port_search_,
 		barchart: barchartcb_,
 		distmap: distmapcb_,
@@ -240,23 +248,6 @@ flight_viz_lib.filterControl = function(){
 
 // Start Task 3
 flight_viz_lib.distmapPlot = function(){
-
-    var current_airline_id = -1;
-		var current_origin_id = "";
-		var current_max_dist = 5000;
-
-    var update_current_airline_id_ = function(id){
-		current_airline_id = id;
-	};
-
-		var update_current_origin_id_ = function(id){
-		//console.log(id)
-		current_origin_id = id;
-	};
-
-    var update_max_dist_ = function(dist){
-		current_max_dist = dist;
-	};
 
 	var routes_from_airport_ = function() {
 			//var airline_distance = parseInt(this.dataset.)
@@ -299,9 +290,6 @@ flight_viz_lib.distmapPlot = function(){
 
     var publicObjs = {
 		plot_airport_routes: routes_from_airport_,
-		update_airline: update_current_airline_id_,
-		update_distance: update_max_dist_,
-		update_origin: update_current_origin_id_,
 		filterctl: filterctlcb_
     };
 
@@ -699,8 +687,7 @@ Promise.all([
 
 	//input for distance filtering
 	d3.select("#nValue").on("input", function() {
-		distmap.update_distance(+this.value);
-		distmap.plot_airport_routes();
+		fc.set_range(+this.value);
 	});
 
 	//autofill for airlines
