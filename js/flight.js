@@ -686,9 +686,19 @@ Promise.all([
 	d3.select('#clear').on('mousedown', routes.clearmap);
 
 	//input for distance filtering
-	d3.select("#nValue").on("input", function() {
-		fc.set_range(+this.value);
-	});
+    $( function() {
+      $("#range-slider").slider({
+        value: 10000,
+        min: 0,
+        max: 10400,
+		step: 200,
+        slide: function( event, ui ) {
+			fc.set_range(parseInt(ui.value));
+			$("#range").val(ui.value + " nautical miles.");
+        }
+      });
+	  $( "#range" ).val($( "#range-slider" ).slider( "value" ) + " nautical miles." );
+    } );
 
 	//autofill for airlines
 	$.getJSON('./Data/topairlines.json', function(data) {

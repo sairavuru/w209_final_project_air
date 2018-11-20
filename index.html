@@ -26,10 +26,11 @@
 	  <div id="srcport">
           <input id="originName"  placeholder="Search for origin ...">
 	  </div>
-	  <div class="filter-prompt">Range filter:</div>
-	  <div id="distance">
-          <input type="number" min="100" max="15000" step="100" value="10000" id="nValue">
+	  <div id="range-selected">
+		  <label for="range">Maximum range selected:</label>
+		  <input type="text" id="range" readonly style="border:0;font-weight:bold;">
 	  </div>
+	  <div id="range-slider"></div>
 	  <div class="filter-prompt" id="analysis-selection">
 		<input type="radio" name="routetype" value="Airline Routes">Airline Routes</input>
 		<input type="radio" name="routetype" value="Airport Routes">Airport Routes</input>
