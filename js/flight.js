@@ -11,8 +11,8 @@ flight_viz_lib = {
 
 flight_viz_lib.svg = d3.select("#routemap")
   .append("svg")
-  .attr('width', flight_viz_lib.width)
-  .attr('height', flight_viz_lib.height);
+  .attr("viewBox", "0 0 " + flight_viz_lib.width + " " + flight_viz_lib.height)
+  .attr('width', "100%");
 
 flight_viz_lib.projection = d3.geoRobinson()
     .scale(180)
@@ -315,8 +315,8 @@ flight_viz_lib.planesData = function() {
 	left: 75,
 	right: 5
   };
-  const width = 1200;
-  const height = 600;
+  const width = 800;
+  const height = 400;
   var xScale = d3.scaleLinear().range([margin.left, width - margin.left - margin.right]);
   var yScale = d3.scaleBand().range([height - margin.bottom - margin.top, margin.top]);
   var colorScale = d3.scaleOrdinal(d3.schemeSet3);
@@ -324,8 +324,8 @@ flight_viz_lib.planesData = function() {
   var svg = d3.select("#planeChart")
 	.append("svg")
     .attr("id", "barchart-svg")
-	.attr('width', width)
-	.attr('height', height);
+    .attr("viewBox", "0 0 " + width + " " + height)
+    .attr('width', "100%");
 
   var barChart = function(tally) {
 	//tally has plane counts for 10 predefined categories by airline or airport

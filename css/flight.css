@@ -9,6 +9,11 @@ path {
    overflow: hidden;
 }
 
+.planeChart {
+	width: 75%;
+    float: left;
+}
+
 .routemap {
 	width: 75%;
     float: left;
