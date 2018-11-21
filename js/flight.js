@@ -334,10 +334,17 @@ flight_viz_lib.planesData = function() {
     var orderedPlaneCounts = Object.keys(tally)
 	    .map(function (equip) { return [equip, tally[equip]];})
 		.sort(function (a, b) { return a[1] - b[1];});
-    xScale.domain([0, d3.max(d3.values(tally))*1.1]);
+
+    var xmax = d3.max(d3.values(tally));
+	if (xmax >= 700) {
+	   xScale.domain([0, xmax*1.1]);
+	} else {
+       xScale.domain([0, 700]);
+	}
+
     yScale.domain(orderedPlaneCounts.map((s) => s[0]));
 
-	var xAxis = d3.axisBottom().scale(xScale).ticks(5);
+	var xAxis = d3.axisBottom().scale(xScale).ticks(14);
 	var yAxis = d3.axisLeft().scale(yScale);
 
     svg.append("g")
