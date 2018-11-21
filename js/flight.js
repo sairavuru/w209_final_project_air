@@ -567,6 +567,8 @@ routes.filterctl(fc);
 barchart.filterctl(fc);
 distmap.filterctl(fc);
 
+// route map plot
+routes.plotworld();
 // initialize the default selction of route plot
 $('input:radio[name=routetype]:nth(0)').attr('checked',true);
 fc.showconf();
@@ -631,9 +633,6 @@ Promise.all([
 			icao_name: d[2]
 		};
 	});
-	// route map plot
-	flight_viz_lib.data(routesData, airportData, airlineData);
-	routes.plotworld();
 
 	// Button listener
 	d3.selectAll('button.airline-select').on('mousedown', fc.set_airline);
@@ -695,6 +694,9 @@ Promise.all([
 		};
 
 	});
+
+	// merge and prepare data
+	flight_viz_lib.data(routesData, airportData, airlineData);
 
 }).catch(function(err) {
 	// handle error here
