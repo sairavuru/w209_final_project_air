@@ -536,6 +536,7 @@ flight_viz_lib.routemapPlot = function() {
 	  d3.selectAll('button').style('background-color', '#f7f7f7');
 	  d3.select(this).style('background-color', '#ddd');
       d3.selectAll("#flights").remove();
+	  $("#barchart-svg").empty();
 	  filterctlcb.resetfilters();
   };
 
