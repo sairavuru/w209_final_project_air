@@ -375,9 +375,9 @@ flight_viz_lib.planesData = function() {
 	.data(orderedPlaneCounts)
 	.enter()
 	.append('rect')
-	.attr('x', margin.left)
+	.attr('x', xScale(0))
 	.attr('y', (s) => yScale(s[0]))
-	.attr('width', (s) => xScale(s[1]))
+	.attr('width', (s) => xScale(s[1]) - xScale(0))
 	.attr('height', yScale.bandwidth())
     .attr("fill", function(d, i) {return colorScale(i); });
 };
