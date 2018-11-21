@@ -319,7 +319,11 @@ flight_viz_lib.planesData = function() {
   const height = 400;
   var xScale = d3.scaleLinear().range([margin.left, width - margin.left - margin.right]);
   var yScale = d3.scaleBand().range([height - margin.bottom - margin.top, margin.top]);
-  var colorScale = d3.scaleOrdinal(d3.schemeSet3);
+  var colorScale = d3.scaleOrdinal(d3.schemeSet3).domain(['boeing_single_aisle',
+                  'boeing_twin_aisle','airbus_single_aisle','airbus_twin_aisle',
+                  'aerospatiale_regional_jet','embraer_regional_jet',
+                  'canadair_regional_jet', 'de_havilland_regional_jet',
+                  'mcDonnell_douglas','other','notspecified']);
 
   var svg = d3.select("#planeChart")
 	.append("svg")
@@ -332,8 +336,9 @@ flight_viz_lib.planesData = function() {
 	$("#barchart-svg").empty();
 
     var orderedPlaneCounts = Object.keys(tally)
-	    .map(function (equip) { return [equip, tally[equip]];})
-		.sort(function (a, b) { return a[1] - b[1];});
+          .map(function (equip) { return [equip, tally[equip]];})
+          .reverse();
+          //.sort(function (a, b) { return a[1] - b[1];});
 
     var xmax = d3.max(d3.values(tally));
 	if (xmax >= 700) {
@@ -379,7 +384,7 @@ flight_viz_lib.planesData = function() {
 	.attr('y', (s) => yScale(s[0]))
 	.attr('width', (s) => xScale(s[1]) - xScale(0))
 	.attr('height', yScale.bandwidth())
-    .attr("fill", function(d, i) {return colorScale(i); });
+    .attr("fill", function(d, i) {return colorScale(d[0]); });
 };
 
 
