@@ -12,4 +12,4 @@ Group 4
 
 - Project [proposal](https://docs.google.com/document/d/184aIwf4hheoruPV648bP_tuYnxsUlt141qSR-6R6w-c/edit?usp=sharing).
 - Midterm [presentation](https://docs.google.com/presentation/d/1n_Wbing8Pfz9tU-7t_w5GYeJJw-KGGva4nI5ks8uFis/edit?usp=sharing).
-- [Test plan](test_plan.md) is the file that contains all required components for this assignment.
+- Usability [test plan](test_plan.md).
