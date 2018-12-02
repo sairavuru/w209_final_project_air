@@ -1,0 +1,60 @@
+path {
+  stroke: white;
+  stroke-width: 0.25px;
+  fill: #778899;
+}
+
+.container {
+   width: 100%;
+   overflow: hidden;
+}
+
+.planeChart {
+	width: 75%;
+    float: left;
+}
+
+.barChartLegend {
+    width: 25%;
+    float: left;
+}
+
+.routemap {
+	width: 75%;
+    float: left;
+}
+
+.controls {
+    float: left;
+    width: 25%;
+    overflow: hidden;
+}
+
+.clearfix{
+    clear: both;
+}
+
+  div#airlines {
+    position: relative;
+  }
+  div.filter-prompt {
+    top-padding: 20px;
+    display: inline-block;
+    font-size: 0.8em;
+  }
+  button {
+    display: inline-block;
+    width: 6em;
+    margin: 0;
+    padding: .5em;
+    outline: none;
+    color: #555;
+    background-color: #f7f7f7;
+    border: 1px dotted #f0f0f0;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #f0f0f0!important;
+  }
