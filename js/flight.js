@@ -331,9 +331,15 @@ flight_viz_lib.planesData = function() {
     .attr("viewBox", "0 0 " + width + " " + height)
     .attr('width', "100%");
 
+  var legend_svg = d3.select("#barChartLegend").append("svg")
+                   .attr("id", "barchart-lengend-svg")
+                   .attr("viewBox", "0 0 " + height + " " + width)
+                   .attr('width', "100%");
+
   var barChart = function(tally) {
 	//tally has plane counts for 10 predefined categories by airline or airport
 	$("#barchart-svg").empty();
+    $("#barchart-lengend-svg").empty();
 
     var orderedPlaneCounts = Object.keys(tally)
           .map(function (equip) { return [equip, tally[equip]];})
@@ -385,6 +391,42 @@ flight_viz_lib.planesData = function() {
 	.attr('width', (s) => xScale(s[1]) - xScale(0))
 	.attr('height', yScale.bandwidth())
     .attr("fill", function(d, i) {return colorScale(d[0]); });
+
+    // legend
+    var legendRectSize = 40,
+        legendText = {'boeing_single_aisle':'Boeing Single Aisle',
+                  'boeing_twin_aisle':'Boeing Twin Aisle',
+                  'airbus_single_aisle':'Airbus Single Aisle',
+                  'airbus_twin_aisle':'Airbus Twin Aisle',
+                  'aerospatiale_regional_jet':'Aerospatiale Regional Jet',
+                  'embraer_regional_jet':'Embraer Regional Jet',
+                  'canadair_regional_jet':'Canadair Regional Jet',
+                  'de_havilland_regional_jet':'De Havilland Regional Jet',
+                  'mcDonnell_douglas':'McDonnell Douglas Jet',
+                  'other':'Other types',
+                  'notspecified':'Not specified'},
+        legendSpacing = 4;
+    var legend = legend_svg.append("g").selectAll("g").data(colorScale.domain())
+                    .enter()
+                    .append("g")
+                    .attr("class", "legend")
+                    .attr("transform", function(d, i) {
+                       var height = legendRectSize;
+                       var horz = 0;
+                       var vert = i * height;
+                       return "translate(" + horz + "," + vert + ")";
+                     });
+    legend.append("rect")
+          .attr("width", legendRectSize)
+          .attr("height", legendRectSize)
+          .style("fill", colorScale)
+          .style("stroke", colorScale);
+
+    legend.append("text")
+          .attr("x", legendRectSize + legendSpacing)
+          .attr("y", legendRectSize/2)
+          .text(function(d) { return legendText[d]; });
+
 };
 
 
@@ -549,6 +591,7 @@ flight_viz_lib.routemapPlot = function() {
 	  d3.select(this).style('background-color', '#ddd');
       d3.selectAll("#flights").remove();
 	  $("#barchart-svg").empty();
+      $("#barchart-lengend-svg").empty();
 	  filterctlcb.resetfilters();
   };
 
