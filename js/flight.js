@@ -170,6 +170,14 @@ flight_viz_lib.filterControl = function(){
 				}
 			}
 		} else { // airport routes mode
+            if (origin_airport_filter === no_src_port_selected) {} else {
+                if (airline_id_filter === no_airline_selected) { // no airline selected
+					distmapcb.plot_airport_routes(function(d) {return d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
+					barchartcb.makeChart(function(d) {return d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
+                } else { // has airline filter
+
+                }
+            }
 
 		}
 	}
@@ -253,20 +261,16 @@ flight_viz_lib.filterControl = function(){
 // Start Task 3
 flight_viz_lib.distmapPlot = function(){
 
-	var routes_from_airport_ = function() {
+	var routes_from_airport_ = function(func) {
 			//var airline_distance = parseInt(this.dataset.)
 			//console.log(current_origin_id)
 		d3.selectAll("#flights").remove();
-// the following code is temporary for proof-of concept
 	     var links = flight_viz_lib.svg.append("g").attr("id", "flights")
 	     .selectAll("path.flight")
 	     .data(flight_viz_lib.finalMergedRoutes)
 	     .enter()
 	     .append("path")
-		   .filter(function(d) { return d.airline_ID === current_airline_id })
-			 .filter(function(d) { return d.src_port_code === current_origin_id })
-			 //.filter(function(d) { return d.src_port_code === "JFK" })
-	     .filter(function(d) { return d.trip_dist < current_max_dist })
+	     .filter(func)
 	     .attr("d", function(d) {
 			 return flight_viz_lib.path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
 		  })
