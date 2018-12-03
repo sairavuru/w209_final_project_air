@@ -3,13 +3,14 @@ image: alpine:latest
 pages:
   stage: deploy
   script:
-  - echo 'Nothing to do...'
+  - mkdir public
+  - mv website/index.html public
+  - mv website/js public
+  - mv website/css public
+  - mv website/Data public
   artifacts:
     paths:
-    - index.html
-    - Data
-    - js
-    - css
+    - public
     expire_in: 1 day
   only:
   - assignment3
