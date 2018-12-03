@@ -656,6 +656,7 @@ flight_viz_lib.routemapPlot = function() {
       d3.selectAll("#flights").remove();
 	  $("#barchart-svg").empty();
       $("#barchart-lengend-svg").empty();
+      flight_viz_lib.svg.select("#airport_route_legend").remove();
 	  filterctlcb.resetfilters();
   };
 
