@@ -6,7 +6,11 @@ pages:
   - echo 'Nothing to do...'
   artifacts:
     paths:
-    - public
+    - index.html
+    - Data
+    - js
+    - css
+    expire_in: 1 day
   only:
   - assignment3
 
