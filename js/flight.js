@@ -183,7 +183,8 @@ flight_viz_lib.filterControl = function(){
 					distmapcb.plot_airport_routes(function(d) {return d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
 					barchartcb.makeChart(function(d) {return d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
                 } else { // has airline filter
-
+					routemapcb.plotroutes(function(d) {return d.airline_ID === airline_id_filter && d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
+					barchartcb.makeChart(function(d) {return d.airline_ID === airline_id_filter && d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
                 }
             }
 
