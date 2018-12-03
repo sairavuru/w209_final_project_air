@@ -183,7 +183,7 @@ flight_viz_lib.filterControl = function(){
 					distmapcb.plot_airport_routes(function(d) {return d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
 					barchartcb.makeChart(function(d) {return d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
                 } else { // has airline filter
-					routemapcb.plotroutes(function(d) {return d.airline_ID === airline_id_filter && d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
+					distmapcb.plot_airport_routes(function(d) {return d.airline_ID === airline_id_filter && d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
 					barchartcb.makeChart(function(d) {return d.airline_ID === airline_id_filter && d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
                 }
             }
@@ -215,6 +215,7 @@ flight_viz_lib.filterControl = function(){
 
     var radio_button_set_mode_ = function() {
         d3.selectAll('button').style('background-color', '#f7f7f7');
+        distmapcb.airport_legend_off();
         resetfilters_();
         update_views_();
         showconf_();
@@ -277,32 +278,72 @@ flight_viz_lib.filterControl = function(){
 
 // Start Task 3
 flight_viz_lib.distmapPlot = function(){
+    var colorScale = d3.scaleThreshold().range(d3.schemeRdBu[6])
+                       .domain([2,4,6,8,10,12]);
+    var legendLinear = d3.legendColor().cells(6).orient("vertical")
+                         .title("Number of flights")
+                         .labels([" 12 +", " 10"," 8",
+                           " 6"," 4"," 2"].reverse()).ascending(true)
+                         .labelAlign("end")
+                         .scale(colorScale); //Your color scale goes here!!!
+
+    var add_airport_route_legend_ = function(){
+       // legend
+        flight_viz_lib.svg.append("g")
+            .attr("id", "airport_route_legend")
+            .attr("transform",
+        "translate(" + 100 + "," + (flight_viz_lib.height - 200) + ")");
+        flight_viz_lib.svg.select("#airport_route_legend").call(legendLinear);
+    }
+
+    var clear_airport_route_legend_ = function() {
+        flight_viz_lib.svg.select("#airport_route_legend").remove();
+    }
+
+    route_counts = function(func){
+        var dest_routes = [];
+        flight_viz_lib.finalMergedRoutes.forEach(
+            function(route) {
+                if(func(route)){
+                    var idx = dest_routes.findIndex(function(d) {
+                        return d.dest_port_code === route.dest_port_code});
+                    if (idx < 0) {
+                        var item = {
+                            dest_port_code: route.dest_port_code,
+                            src_port_code: route.src_port_code,
+                            src_lat: route.src_lat,
+                            src_long: route.src_long,
+                            dest_lat: route.dest_lat,
+                            dest_long: route.dest_long,
+                            count: 1};
+                        dest_routes.push(item);
+                    }
+                    else {
+                        dest_routes[idx].count ++;
+                    }
+                }
+            }
+        );
+        return dest_routes;
+    };
 
 	var routes_from_airport_ = function(func) {
-			//var airline_distance = parseInt(this.dataset.)
-			//console.log(current_origin_id)
-		d3.selectAll("#flights").remove();
-	     var links = flight_viz_lib.svg.append("g").attr("id", "flights")
+        var dests = route_counts(func);
+
+        d3.selectAll("#flights").remove();
+        var links = flight_viz_lib.svg.append("g").attr("id", "flights")
 	     .selectAll("path.flight")
-	     .data(flight_viz_lib.finalMergedRoutes)
+	     .data(dests)
 	     .enter()
 	     .append("path")
-	     .filter(func)
 	     .attr("d", function(d) {
 			 return flight_viz_lib.path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
 		  })
 	     .style("fill", "none")
-	     .style("stroke-width", 0.6)
-		   .style("stroke", function(d) {
-	  		 if (d.code_share === "Y") {
-	               rt_col = "#377eb8";
-	  		 }
-	  		 else {
-	               rt_col = "#e41a1c";
-	  		 }
-	  	     return rt_col;
-	  	  })
-	     .style("stroke-opacity", 0.2);
+	     .style("stroke-width", 1)
+         .style("stroke", function(d){return colorScale(d.count);});
+
+         add_airport_route_legend_();
 	};
 
     var filterctlcb = function() {};
@@ -315,6 +356,8 @@ flight_viz_lib.distmapPlot = function(){
 
     var publicObjs = {
 		plot_airport_routes: routes_from_airport_,
+        airport_legend_on: add_airport_route_legend_,
+        airport_legend_off: clear_airport_route_legend_,
 		filterctl: filterctlcb_
     };
 
