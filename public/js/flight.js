@@ -160,7 +160,11 @@ flight_viz_lib.filterControl = function(){
 		d3.selectAll("#flights").remove();
 
 		if ($('input:radio[name=routetype]:checked').val() === "Airline Routes") {
-			if (airline_id_filter === no_airline_selected) {} else {
+			if (airline_id_filter === no_airline_selected) {
+                d3.selectAll("#flights").remove();
+                $("#barchart-svg").empty();
+                $("#barchart-lengend-svg").empty();
+			} else {
 				if (origin_airport_filter === no_src_port_selected) { // no src port
 					routemapcb.plotroutes(function(d) {return d.airline_ID === airline_id_filter && d.trip_dist <= max_dist_filter});
 					barchartcb.makeChart(function(d) {return d.airline_ID === airline_id_filter && d.trip_dist <= max_dist_filter});
@@ -170,6 +174,18 @@ flight_viz_lib.filterControl = function(){
 				}
 			}
 		} else { // airport routes mode
+            if (origin_airport_filter === no_src_port_selected) {
+                d3.selectAll("#flights").remove();
+                $("#barchart-svg").empty();
+                $("#barchart-lengend-svg").empty();
+            } else {
+                if (airline_id_filter === no_airline_selected) { // no airline selected
+					distmapcb.plot_airport_routes(function(d) {return d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
+					barchartcb.makeChart(function(d) {return d.src_port_code === origin_airport_filter && d.trip_dist <= max_dist_filter});
+                } else { // has airline filter
+
+                }
+            }
 
 		}
 	}
@@ -195,6 +211,11 @@ flight_viz_lib.filterControl = function(){
       update_views_();
 	  showconf_();
     };
+
+    var radio_button_set_mode_ = function() {
+        update_views_();
+        showconf_();
+    }
 
     var airline_search_box_ = function(d){
         d3.selectAll('button').style('background-color', '#f7f7f7');
@@ -242,6 +263,7 @@ flight_viz_lib.filterControl = function(){
 		distmap: distmapcb_,
 		routemap: routemapcb_,
 		resetfilters: resetfilters_,
+        setmode: radio_button_set_mode_,
 		showconf: showconf_
     };
 
@@ -253,20 +275,16 @@ flight_viz_lib.filterControl = function(){
 // Start Task 3
 flight_viz_lib.distmapPlot = function(){
 
-	var routes_from_airport_ = function() {
+	var routes_from_airport_ = function(func) {
 			//var airline_distance = parseInt(this.dataset.)
 			//console.log(current_origin_id)
 		d3.selectAll("#flights").remove();
-// the following code is temporary for proof-of concept
 	     var links = flight_viz_lib.svg.append("g").attr("id", "flights")
 	     .selectAll("path.flight")
 	     .data(flight_viz_lib.finalMergedRoutes)
 	     .enter()
 	     .append("path")
-		   .filter(function(d) { return d.airline_ID === current_airline_id })
-			 .filter(function(d) { return d.src_port_code === current_origin_id })
-			 //.filter(function(d) { return d.src_port_code === "JFK" })
-	     .filter(function(d) { return d.trip_dist < current_max_dist })
+	     .filter(func)
 	     .attr("d", function(d) {
 			 return flight_viz_lib.path ({type:"LineString", coordinates: [ [d.src_long, d.src_lat], [d.dest_long, d.dest_lat] ]});
 		  })
@@ -708,6 +726,11 @@ Promise.all([
       });
 	  $( "#range" ).val($( "#range-slider" ).slider( "value" ) + " nautical miles." );
     } );
+
+    // mode selection
+    $('input[type=radio][name=routetype]').change(function() {
+        fc.setmode();
+    });
 
 	//autofill for airlines
 	$.getJSON('./Data/topairlines.json', function(data) {
