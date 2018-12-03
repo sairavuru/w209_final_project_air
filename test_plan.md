@@ -11,3 +11,7 @@ nautical miles?
 5. What is the top 3 airplane types leaving JFK airport?
 
 6. Can you locate route that has most flights leaving SEA airport?
+
+7. What is the longest route for Lufthansa?
+
+8. Name the top 3 routes with both Delta and Southwest airlines serving the same route?
