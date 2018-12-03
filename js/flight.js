@@ -216,6 +216,7 @@ flight_viz_lib.filterControl = function(){
     var radio_button_set_mode_ = function() {
         d3.selectAll('button').style('background-color', '#f7f7f7');
         distmapcb.airport_legend_off();
+        routemapcb.codeshare_legend_off();
         resetfilters_();
         update_views_();
         showconf_();
@@ -648,7 +649,26 @@ flight_viz_lib.routemapPlot = function() {
  	     return rt_col;
  	  })
       .style("stroke-opacity", 0.2);
+      add_code_share_legend_();
   };
+
+  var codeShare = d3.scaleOrdinal().domain(["Codeshare: Yes", "Codeshare: No"])
+                    .range([ "#377eb8", "#e41a1c"]);
+  var legendCodeShare = d3.legendColor()
+                    .shape("path", d3.symbol().type(d3.symbolCircle).size(50)())
+                    .shapePadding(10)
+                    .scale(codeShare);
+  var add_code_share_legend_ = function(){
+      flight_viz_lib.svg.append("g")
+          .attr("id", "codeshare_legend")
+          .attr("transform",
+      "translate(" + 100 + "," + (flight_viz_lib.height - 100) + ")");
+      flight_viz_lib.svg.select("#codeshare_legend").call(legendCodeShare);
+  };
+
+  var clear_airport_route_legend_ = function() {
+      flight_viz_lib.svg.select("#codeshare_legend").remove();
+  }
 
   var clear_routes_ = function () {
 	  d3.selectAll('button').style('background-color', '#f7f7f7');
@@ -657,6 +677,7 @@ flight_viz_lib.routemapPlot = function() {
 	  $("#barchart-svg").empty();
       $("#barchart-lengend-svg").empty();
       flight_viz_lib.svg.select("#airport_route_legend").remove();
+      clear_airport_route_legend_();
 	  filterctlcb.resetfilters();
   };
 
@@ -672,6 +693,7 @@ flight_viz_lib.routemapPlot = function() {
     plotworld: worldmap_,
     clearmap: clear_routes_,
     plotroutes: routemap_plot_,
+    codeshare_legend_off:clear_airport_route_legend_,
 	filterctl: filterctlcb_
   };
 
