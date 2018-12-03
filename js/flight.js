@@ -214,6 +214,7 @@ flight_viz_lib.filterControl = function(){
     };
 
     var radio_button_set_mode_ = function() {
+        resetfilters_();
         update_views_();
         showconf_();
     }
