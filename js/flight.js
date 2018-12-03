@@ -214,6 +214,7 @@ flight_viz_lib.filterControl = function(){
     };
 
     var radio_button_set_mode_ = function() {
+        d3.selectAll('button').style('background-color', '#f7f7f7');
         resetfilters_();
         update_views_();
         showconf_();
