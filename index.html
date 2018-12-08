@@ -11,6 +11,17 @@
 <div class="container">
    <div id="routemap" class="routemap"></div>
    <div id="controls" class="controls">
+       <h4 style="color:blue;">Step 1: choose a mode</h4>
+       <ul>
+           <li> Airline Routes mode: flight network for an airline. One airline
+               must be selected. </li>
+            <li>Airport Route mode: flights originated from an airport. One source airport must be selected.</li>
+       </ul>
+ 	  <div class="filter-prompt" id="analysis-selection">
+ 		<input type="radio" name="routetype" value="Airline Routes">Airline Routes</input>
+ 		<input type="radio" name="routetype" value="Airport Routes">Airport Routes</input>
+ 	  </div>
+      <h4 style="color:blue;">Step 2: set filters</h4>
       <div class="filter-prompt">Airline filter:</div>
 	  <div id="airlines">
           <button class="airline-select" data-airlineid="24">AA</button>
@@ -27,14 +38,11 @@
           <input id="originName"  placeholder="Search for origin ...">
 	  </div>
 	  <div id="range-selected">
-		  <label for="range">Maximum range selected:</label>
+		  <label for="range">Maximum range filter:</label>
 		  <input type="text" id="range" readonly style="border:0;font-weight:bold;">
 	  </div>
 	  <div id="range-slider"></div>
-	  <div class="filter-prompt" id="analysis-selection">
-		<input type="radio" name="routetype" value="Airline Routes">Airline Routes</input>
-		<input type="radio" name="routetype" value="Airport Routes">Airport Routes</input>
-	  </div>
+      <h4 style="color:blue;">Configuration summary</h4>
 	  <div id="ctl-config"></div>
 	  <div class="filter-prompt" id="resetmap">
         <button id="clear">Clear</button>
