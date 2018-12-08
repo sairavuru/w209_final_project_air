@@ -22,7 +22,7 @@
  		<input type="radio" name="routetype" value="Airport Routes">Airport Routes</input>
  	  </div>
       <h4 style="color:blue;">Step 2: set filters</h4>
-      <div class="filter-prompt">Airline filter:</div>
+      <div class="filter-prompt">Click an airline or type an airline code to set it:</div>
 	  <div id="airlines">
           <button class="airline-select" data-airlineid="24">AA</button>
           <button class="airline-select" data-airlineid="2009">DL</button>
@@ -33,7 +33,7 @@
 	  <div id="airline-searchbox">
 		  <input id="airlineName"  placeholder="Search for airlines ...">
 	  </div>
-	  <div class="filter-prompt">Source airport filter (select ZZZ to reset):</div>
+	  <div class="filter-prompt">Type source airport code to set it (type ZZZ to reset to none):</div>
 	  <div id="srcport">
           <input id="originName"  placeholder="Search for origin ...">
 	  </div>
@@ -44,6 +44,7 @@
 	  <div id="range-slider"></div>
       <h4 style="color:blue;">Configuration summary</h4>
 	  <div id="ctl-config"></div>
+      <h4 style="color:blue;">Click below to clear/reset</h4>
 	  <div class="filter-prompt" id="resetmap">
         <button id="clear">Clear</button>
       </div>
