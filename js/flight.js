@@ -32,6 +32,18 @@ flight_viz_lib.path = d3.geoPath()
 //     "translate(" + d3.event.translate + ") scale(" + d3.event.scale + ")");
 // }
 
+// var tooltip = d3.select("body")
+// 	.append("div")
+// 	.style("position", "absolute")
+// 	.style("z-index", "10")
+// 	.style("visibility", "hidden")
+// 	.text("a simple tooltip");
+
+// Define the div for the tooltip
+var div = d3.select("body").append("div")
+		.attr("class", "tooltip")
+		.style("opacity", 0);
+
 flight_viz_lib.data = function(rd, pd, ad) {
 	flight_viz_lib.routesData = rd;
 	flight_viz_lib.airportData = pd;
@@ -75,7 +87,7 @@ flight_viz_lib.data = function(rd, pd, ad) {
 					if (unit == "N") {
 						dist = dist * 0.8684
 					}
-					return dist;
+					return Math.round(dist);
 				}
 			}
 
@@ -355,12 +367,23 @@ flight_viz_lib.distmapPlot = function(){
          .style("stroke", function(d){return colorScale(d.count);})
 				 .on('mouseover', function(d) {
 		 			d3.select(this).style('stroke-width', 3)
+					div.transition()
+                .duration(500)
+                .style("opacity", 0.9)
+					div.html(d.src_port_code + "<br/>"  + d.dest_port_code + "<br/>")
+			       .style("left", (d3.event.pageX) + "px")
+			       .style("top", (d3.event.pageY - 28) + "px")
 		 	})
 		 		.on('mouseout', function(d) {
 		 			d3.select(this).style('stroke-width', 0.6)
+					div.transition()
+                .duration(500)
+                .style("opacity", 0)
+						//return tooltip.style("visibility", "visible")
 		 	})
          add_airport_route_legend_();
 	};
+		//links.call(tooltip);
 
     var filterctlcb = function() {};
     var filterctlcb_ = function(_) {
@@ -641,9 +664,6 @@ flight_viz_lib.routemapPlot = function() {
     		.attr("fill", "red");*/
    });
   };
-	var tooltip = d3.select("body").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
 
   var routemap_plot_ = function (func) {
       var links = flight_viz_lib.svg.append("g").attr("id", "flights")
@@ -670,10 +690,17 @@ flight_viz_lib.routemapPlot = function() {
 		.on('mouseover', function(d) {
 			d3.select(this).style('stroke-width', 2)
 										.style("stroke-opacity", 1)
+			div.transition()
+				.style("opacity", 0.9)
+			div.html(d.src_port_code + "<br/>"  + d.dest_port_code + "<br/>" + d.trip_dist + "NM")
+				 .style("left", (d3.event.pageX) + "px")
+				 .style("top", (d3.event.pageY - 28) + "px")
 	})
 		.on('mouseout', function(d) {
 			d3.select(this).style('stroke-width', 0.6)
 										.style("stroke-opacity", 0.2)
+			div.transition()
+				.style("opacity", 0)
 	})
       add_code_share_legend_();
   };
